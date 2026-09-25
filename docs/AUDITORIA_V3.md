@@ -134,6 +134,8 @@ Além de `lib/utils/formatters.dart`, há `DateFormat` direto em outras superfí
 
 **Correção incorporada na V3:** inventariar chamadas de DateFormat, NumberFormat, String.format, toStringAsFixed e concatenação user-facing em todo o runtime.
 
+Também foi confirmado que o projeto não define `Intl.defaultLocale`. Portanto, mudar apenas `MaterialApp.locale` não é autoridade suficiente para os formatters existentes: a V3 exige locale explícito na borda de apresentação e proíbe depender de um global intl como segunda autoridade.
+
 ### 8. Apple possui UI própria e UI controlada pelo SO
 
 Foram confirmadas strings de sistema em:
