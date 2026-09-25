@@ -1,4 +1,4 @@
-# Matriz de testes i18n — V3
+# Matriz de testes i18n — V4
 
 ## Locales
 
@@ -33,7 +33,7 @@
 - system locale change with manual override
 - restart persistence
 - BCP47 persisted pt-BR vs gen_l10n pt_BR
-- corrupt native locale mirror
+- corrupt/unknown canonical native locale backing preference
 - App language vs OS-owned localization boundary
 
 ## Isolation invariants
@@ -66,6 +66,10 @@
 | AndroidTvTorrentPlayerActivity | yes | | | yes | yes |
 | TorboxTvPlayerActivity | yes | | | yes | yes |
 | Android background notifications | yes | | | yes | yes |
+| Non-Android plugin notifications | yes | yes | | manual | yes |
+| Remote product copy | yes | yes | | | yes |
+| Runtime asset copy | yes | yes | | | yes |
+| Rich text/custom painting | yes | yes | yes | yes | |
 | macOS MainMenu | yes | | | manual | yes |
 | Windows installer | yes | | | manual | yes |
 | Web DOM lang/dir | yes | yes | | | yes |
@@ -203,3 +207,33 @@ Before promoting pt-BR:
 - dev/test/example/generated code is classified rather than silently excluded
 - SYSTEM_OWNED_UI and THIRD_PARTY_OWNED_UI findings carry ownership evidence
 - stale allowlist entry fails CI
+
+
+## V4 remote/runtime copy
+
+- SupportRemoteConfig fixed Settings labels come from ARB;
+- fallback asset and cached config resolve correctly in en and pt-BR;
+- changing App language re-resolves campaign copy without stale cache language;
+- malformed/partial remote payload falls back safely;
+- shipping pt-BR reports English fallback of official copy as incomplete;
+- official engine catalogue has a pt-BR editorial path;
+- third-party imported engine copy remains external data;
+- runtime JSON/YAML/CSV/Markdown reaching UI is inventoried;
+- offline mode preserves a deterministic locale fallback.
+
+## V4 rich text/custom painting
+
+- Text.rich/RichText output is correct in en/pt-BR;
+- styled/clickable placeholders can move position according to locale grammar;
+- Semantics exposes the complete sentence;
+- pseudo-RTL keeps spans, gestures and bidi isolation correct;
+- launch idents/custom painters are localized or explicitly BRAND_ART_DIRECTION;
+- no Canvas/TextPainter copy bypasses the inventory.
+
+## V4 directionality
+
+- app-owned hardcoded TextDirection is zero or explicitly classified;
+- generic content text measurement uses ambient Directionality unless physically justified;
+- semantic left/right paddings/alignments migrate to start/end;
+- player timeline/media geometry intentionally physical remains stable;
+- package/vendored LTR behavior carries ownership evidence rather than silent exclusion.
