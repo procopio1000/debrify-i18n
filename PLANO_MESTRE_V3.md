@@ -186,18 +186,30 @@ A camada de apresentação converte isso para AppLocalizations.
 
 Exceptions brutas e Exception.toString() não são copy de UI.
 
-## 2.5 Preferência de App language é device-local em V3
+## 2.5 Preferência de App language é installation/device setting em V3
 
 Política inicial:
 
-- local ao dispositivo;
+- local à instalação/dispositivo, fora do namespace de perfil;
 - disponível antes do ProfileGate;
 - não pertence ao perfil;
+- usar `DevicePreferences`, não `ProfilePreferences`;
+- registrar `ui_locale_v1` em `DevicePreferences.allowedKeys`;
+- não introduzir raw `SharedPreferences.getInstance()` em feature code só para i18n;
+- `ProfilePreferencePortability.allowsKey('ui_locale_v1')` deve retornar false;
 - não é sincronizada por WebDAV;
-- não é transportada automaticamente em backup de perfil;
+- não é transportada pelo backup/restore de perfil do Debrify;
 - não muda ao trocar de perfil;
 - pode ser resetada para System default;
 - preferência inválida/corrompida nunca pode impedir startup.
+
+### Backup/migração do SO
+
+“Device-local” aqui significa fora da autoridade de perfil/sync do Debrify.
+
+Na baseline Android, `backup_rules.xml` e `data_extraction_rules.xml` excluem todos os SharedPreferences de cloud backup e device transfer; portanto `ui_locale_v1` não viaja pelo backup Android atual.
+
+Em Apple/desktop, restore/migração de preferências pelo próprio SO é uma política da plataforma e não deve ser confundida com WebDAV/profile portability. Se o requisito futuro for “jamais atravessar instalação”, criar regra de plataforma explícita em vez de assumir comportamento.
 
 ## 2.6 Autoridade de locale por superfície
 
@@ -208,8 +220,8 @@ Contrato V3:
 | Superfície | Autoridade |
 |---|---|
 | Flutter UI | AppLocaleController |
-| Android Activities próprias | AppLocaleController espelhado via NativeLocaleBridge/NativeLocaleStore |
-| Android Services/Receivers/notifications próprias | NativeLocaleStore, espelho read-only da autoridade Dart |
+| Android Activities próprias | AppLocaleController + NativeLocaleBridge; NativeLocaleStore lê a mesma preferência device-owned |
+| Android Services/Receivers/notifications próprias | NativeLocaleStore, leitor nativo da mesma `ui_locale_v1` |
 | Android system dialogs | locale efetivo do Android/app conforme plataforma |
 | iOS/tvOS/macOS Flutter body | AppLocaleController |
 | Apple permission prompts / InfoPlist.strings | bundle/per-app/system language do SO |
@@ -391,12 +403,15 @@ Isso evita o problema de uma tradução parcial entrar automaticamente em AppLoc
 Responsabilidades:
 
 - initialize antes da UI que depende do locale;
-- ler ui_locale_v1;
+- obter `DevicePreferences.instance()`;
+- ler `ui_locale_v1` por `DevicePreferences`;
 - null/system = seguir sistema;
 - aceitar BCP 47;
 - normalizar aliases legados;
 - rejeitar locale não shipping;
-- persistir atomicamente;
+- persistir atomicamente via `DevicePreferences`;
+- manter `ui_locale_v1` em `DevicePreferences.allowedKeys`;
+- não criar raw SharedPreferences access novo para o controller;
 - notificar a raiz;
 - reagir a mudança de locales do SO quando em System default;
 - não bloquear startup em falha de storage.
@@ -414,9 +429,16 @@ API conceitual:
       void didChangeLocales(List<Locale>? locales);
     }
 
-Persistência:
+Persistência canônica única:
 
+    DevicePreferences.allowedKeys += ui_locale_v1
     ui_locale_v1 = system | en | pt-BR | ...
+
+Testes arquiteturais obrigatórios:
+
+    ProfilePreferencePortability.allowsKey('ui_locale_v1') == false
+
+Também ajustar os source-guards que pinam accesses device-owned para impedir regressão para storage profile-scoped ou raw SharedPreferences.
 
 ## 3.6 Codec e resolução de locale
 
@@ -1033,20 +1055,35 @@ Centralizar em `NativeLocaleBridge` + `NativeLocaleStore`.
 
 ### NativeLocaleStore
 
-O Dart continua sendo a autoridade. O storage Android é apenas espelho necessário para processos/componentes que podem iniciar sem engine Flutter.
+A V3 **não cria uma segunda preferência/mirror** quando a mesma preferência device-owned pode ser lida por Dart e Android nativo.
 
-Persistir de forma atômica:
+Fonte persistida única:
 
-    ui_locale_native_mirror_v1 = system | BCP47
+    ui_locale_v1 = system | BCP47
+
+Dart:
+
+- lê/escreve por `DevicePreferences`;
+- registra a key em `DevicePreferences.allowedKeys`;
+- valida contra ShippingLocales antes da gravação.
+
+Android nativo:
+
+- `NativeLocaleStore` é um adapter de leitura da preferência física escrita pelo plugin;
+- o projeto já lê `FlutterSharedPreferences` nativamente em outra integração; para a baseline atual, o adapter pode ler a key física correspondente a `ui_locale_v1` (por exemplo `flutter.ui_locale_v1`);
+- esse detalhe fica isolado em um único adapter;
+- contract test fixa o backing file/key da versão atual de `shared_preferences`;
+- se o backend do plugin mudar, altera-se apenas o adapter/bridge.
 
 Regras:
 
-- escrever sempre que AppLocaleController muda;
-- validar contra shipping locales no lado Dart antes de espelhar;
-- Native nunca promove locale por conta própria;
-- corrupção => system/en seguro;
-- remover/atualizar mirror em rollback;
-- nenhum profile id ou dado sensível no mesmo store.
+- nenhum segundo key `ui_locale_native_mirror_*`;
+- Native nunca escreve/promove locale por conta própria;
+- corrupção/ausência => system/en seguro;
+- app/device reset limpa a mesma preferência junto com os demais SharedPreferences;
+- nenhum profile id ou dado sensível nessa preferência.
+
+`NativeLocaleBridge` sinaliza/aplica mudanças em superfícies nativas já vivas; ele não mantém outra fonte de persistência.
 
 ### Activities
 
@@ -1321,7 +1358,9 @@ Entregas:
 - preflight de dependências Flutter 3.44.8 / intl 0.20.2;
 - inventário por reachability com contagem baseline do artifact;
 - contrato de ownership OS/app/third-party;
-- schema de NativeLocaleStore.
+- contrato de DevicePreferences/NativeLocaleStore single-store;
+- prova de exclusão por ProfilePreferencePortability;
+- auditoria de backup rules por plataforma.
 
 Aceite:
 
@@ -1971,7 +2010,8 @@ Se locale override causar regressão:
 - ARBs são empacotados no app;
 - falha do controller devolve system/en;
 - native player recebe fallback seguro;
-- NativeLocaleStore corrompido retorna system/en;
+- `ui_locale_v1` ausente/corrompido retorna system/en;
+- app/device reset não deixa locale nativo órfão;
 - Services/Receivers continuam funcionais sem Flutter;
 - OS-owned Apple/installer surfaces não são tratadas como falha do override interno.
 
@@ -2059,10 +2099,13 @@ Mitigação:
 
 Mitigação:
 
-- NativeLocaleStore espelhado atomicamente;
+- uma única `ui_locale_v1` em DevicePreferences;
+- NativeLocaleStore lê o mesmo backing store;
+- NativeLocaleBridge apenas atualiza superfícies vivas;
 - component-local Context;
 - re-upsert de notification channels;
-- testes com process kill/reboot.
+- contract test do backing key atual;
+- testes com process kill/reboot/reset.
 
 ## Risco: Apple/installer não segue override interno
 
@@ -2109,6 +2152,10 @@ O trabalho está concluído somente quando TODOS os itens abaixo forem verdadeir
 - [ ] Formatters são locale-aware onde aplicável.
 - [ ] Android native values-pt-rBR completo.
 - [ ] Zero android:text/contentDescription literal user-facing fora de allowlist.
+- [ ] ui_locale_v1 pertence a DevicePreferences.allowedKeys.
+- [ ] ProfilePreferencePortability rejeita ui_locale_v1.
+- [ ] Nenhum raw SharedPreferences access novo foi introduzido para o controller.
+- [ ] NativeLocaleStore lê a mesma preferência canônica, sem mirror duplicado.
 - [ ] NativeLocaleStore cobre cold-start de Service/Receiver.
 - [ ] Notifications/actions/channels localizados e testados após process kill.
 - [ ] Ambas Activities nativas principais do player testadas.
