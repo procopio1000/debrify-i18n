@@ -851,6 +851,19 @@ A V3 confirmou chamadas diretas de `DateFormat` em outras superfícies, incluind
 
 Formatos de log/protocolo, como timestamp ISO UTC de diagnóstico, permanecem técnicos e não devem ser localizados.
 
+### Regra de autoridade para intl
+
+`MaterialApp.locale` não configura automaticamente todo `DateFormat`/intl já existente.
+
+Para UI:
+
+- formatter recebe `Locale`/BCP-47 efetivo explicitamente;
+- preferir `Localizations.localeOf(context)` na borda de apresentação e passar o valor ao formatter;
+- evitar `DateFormat(...)` user-facing sem locale;
+- não usar `Intl.defaultLocale` como segunda autoridade global do produto;
+- scanner/CI detecta novos `DateFormat`/formatters user-facing sem locale explícito;
+- testes de override devem provar: system en + App language pt-BR gera data/número PT-BR e o inverso também.
+
 ---
 
 # 7. RTL, layout, fontes, acessibilidade e input
