@@ -77,7 +77,10 @@ Scan beyond Text(...):
 - TextPainter/CustomPainter/Canvas text;
 - TaskNotification/background_downloader copy;
 - runtime-loaded JSON/YAML/CSV/Markdown que alimenta UI;
-- remote product copy e fallback assets.
+- remote product copy e fallback assets;
+- MarkdownBody/Markdown sources;
+- official setup/help links and QR destinations;
+- SVG text and runtime visual assets with potential embedded copy.
 
 All exceptions require a versioned reason.
 
@@ -166,7 +169,7 @@ Test:
 - TV D-pad/focus;
 - Semantics/contentDescription.
 
-## Gate 12 — remote/runtime product copy
+## Gate 12 / Gate L — remote/runtime product copy
 
 Fail or block promotion when:
 
@@ -175,11 +178,13 @@ Fail or block promotion when:
 - official engine-catalog editorial copy has no pt-BR path;
 - cached remote copy can retain the previous locale variant;
 - a runtime asset reaches UI without inventory/classification;
+- official Markdown/release content has no ownership/locale policy;
+- an essential official setup/help destination has no documented locale policy;
 - fixed Settings copy still comes from English remote config instead of ARB.
 
 Completeness report must expose ARB, native resources, remote product copy, product-controlled remote catalog and runtime asset copy separately.
 
-## Gate 13 — directionality and inline-text safety
+## Gate 13 / Gate M — directionality and inline-text safety
 
 Report app-owned runtime occurrences of:
 
