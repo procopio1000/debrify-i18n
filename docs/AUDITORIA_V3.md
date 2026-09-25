@@ -143,6 +143,8 @@ Foram confirmadas strings de sistema em:
 
 Também foi confirmado que o menu macOS em `Base.lproj/MainMenu.xib` contém grande quantidade de copy inglesa.
 
+Os três projetos Apple auditados (iOS, tvOS e macOS) ainda declaram apenas `knownRegions = (en, Base)`, então adicionar arquivos pt-BR sem atualizar o projeto Xcode seria insuficiente.
+
 O ponto arquitetural importante é que `InfoPlist.strings` e permission prompts são escolhidos pelo bundle/idioma do sistema/per-app language. Um seletor interno Flutter não consegue reescrever isso de forma suportada em runtime.
 
 **Correção incorporada na V3:**
