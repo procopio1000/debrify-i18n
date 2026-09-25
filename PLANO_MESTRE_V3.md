@@ -469,18 +469,43 @@ Casos obrigatórios de teste: `pt-BR`, `pt_BR`, `pt`, `pt-PT`, `en-US`, `en-GB`,
 
 ## 3.7 Todos os roots Flutter devem compartilhar a mesma configuração
 
-Cobrir MaterialApp de:
+A auditoria V3 confirmou múltiplos `MaterialApp` de produção em `lib/main.dart`.
 
-- app principal;
-- startup failure;
-- migration/update;
-- recovery;
-- Linux vault bootstrap;
-- quaisquer hosts reais executáveis pelo usuário.
+Cobrir explicitamente:
 
-Criar helper compartilhado de delegates/locales/resolution para impedir drift.
+- `DebrifyApp` principal;
+- `_MigrationUpdateScreen`;
+- `ProfileRecoveryScreen` hospedado pelo MaterialApp inline do recovery;
+- `_StartupFailureApp`;
+- `_LinuxVaultBootstrapHost`;
+- qualquer novo host de bootstrap/recovery que possa executar antes do app principal.
+
+### Ordem de startup
+
+`AppLocaleController.initialize()` precisa ocorrer **antes de qualquer caminho que possa chamar runApp**.
+
+Fluxo conceitual:
+
+    WidgetsFlutterBinding.ensureInitialized()
+      -> AppLocaleController.initialize()   // non-fatal, DevicePreferences
+      -> migration/recovery/profile bootstrap decisions
+      -> qualquer runApp
+
+Se storage de locale falhar, o controller cai para system/en e o startup continua.
+
+Criar um helper/wrapper compartilhado para os MaterialApps de bootstrap contendo:
+
+- `locale`;
+- `supportedLocales = ShippingLocales.locales`;
+- delegates;
+- locale resolution;
+- listener do AppLocaleController.
+
+O app principal mantém suas chaves/observers/builders próprios, mas consome a mesma fonte de locale.
 
 Hosts de testes e ferramentas só precisam de localization quando renderizam widgets reais cuja copy depende dela.
+
+Teste obrigatório: system en + override pt-BR mostra PT-BR até em migration/recovery/startup failure/Linux vault; system pt-BR + override en mostra inglês nessas mesmas superfícies.
 
 ## 3.8 Política de generated code
 
@@ -562,13 +587,24 @@ A copy de busca deve ser gerada no locale atual:
 - localized category;
 - localized search keywords/synonyms.
 
-Quando o locale muda, o índice é reconstruído.
+O índice atual possui centenas de aliases ingleses manuais em `settings_screen.dart`. Não traduzir tudo mecanicamente.
 
-Não anexar a palavra inglesa settings universalmente. Criar keyword localizada para o domínio de configurações.
+Classificar aliases em:
+
+- `LOCALIZED_ALIAS` — conceito natural ao usuário, ganha equivalente PT-BR;
+- `TECHNICAL_ALIAS` — 4K, EPG, codec, API, URL etc., permanece canônico;
+- `BRAND_ALIAS` — TorBox, Trakt, Simkl, WebDAV etc.;
+- `LEGACY_EN_ALIAS` — termo inglês útil mantido deliberadamente para não regredir busca de power users.
+
+Quando o locale muda, o índice é reconstruído/invalidado.
+
+Não anexar a palavra inglesa `settings` universalmente. Usar keyword localizada do domínio de configurações e, se desejado por compatibilidade, manter `settings` como `LEGACY_EN_ALIAS` em PT-BR.
+
+Como `_buildSearchIndex()` já é construído fresh ao abrir a busca, preservar essa propriedade; não introduzir cache global de strings localizadas sem invalidation.
 
 ## 4.3 Normalização de busca
 
-Criar uma função única, testada, para pesquisa de UI.
+Criar uma função única, testada, para pesquisa de UI, por exemplo `SettingsSearchNormalizer`.
 
 Ela deve definir explicitamente:
 
@@ -579,11 +615,22 @@ Ela deve definir explicitamente:
 - equivalência esperada para PT-BR;
 - comportamento de caracteres não latinos.
 
-Exemplo de aceite:
+Dart core não fornece normalização Unicode completa como um contrato pronto de produto; portanto não espalhar maps/regex ad-hoc por widgets. Centralizar a regra e os testes.
 
-- configuracoes encontra Configurações;
-- legenda encontra a entrada traduzida pertinente;
-- termos ingleses podem ser preservados apenas como aliases deliberados quando forem termos técnicos conhecidos, não por acidente.
+Aceite PT-BR mínimo:
+
+    configuração == configuracao
+    áudio == audio
+    vídeo == video
+    conexão == conexao
+    reprodução == reproducao
+    configurações == configuracoes
+
+Também testar ç/Ç, ã/õ, ê/ô, múltiplos espaços e query vazia.
+
+Para futuros idiomas, não reaproveitar cegamente remoção de diacríticos se isso puder mudar significado no idioma alvo.
+
+Termos ingleses são preservados apenas como aliases deliberados (technical/brand/legacy), não por acidente.
 
 Não usar normalização de busca para alterar dados persistidos.
 
