@@ -155,7 +155,39 @@ Política V4:
 
 O nome do destino não deve ficar incompreensível porque foi traduzido para o idioma atualmente ativo.
 
-### 10. “External data” foi refinado
+### 10. Markdown/release notes oficiais também são uma superfície
+
+Confirmado em:
+
+    lib/main.dart
+    lib/screens/settings_screen.dart
+
+Ambos renderizam `release.body` usando `MarkdownBody`.
+
+O chrome/fallback local deve ir para ARB. O body precisa ser classificado como conteúdo editorial oficial, com política explícita de cobertura pt-BR.
+
+### 11. Guia oficial WebDAV é acionado diretamente pelo app
+
+Confirmado em:
+
+    lib/screens/settings/sync_and_migrate_page.dart
+    assets/images/webdav_sync_guide_qr.png
+
+O app usa uma URL fixa:
+
+    https://debrify.tv/guides/webdav-sync/
+
+e um QR empacotado para o mesmo destino.
+
+A V4 não presume que o conteúdo do site esteja ou não traduzido; ela exige que esse destino tenha política de locale, porque faz parte de um fluxo oficial de setup. Preferência: landing page estável com locale negotiation/picker para o mesmo QR funcionar em todos os idiomas.
+
+### 12. Assets visuais precisam de classificação quando carregam texto
+
+Source scanners não enxergam copy baked em PNG/JPG/PDF. SVG pode ser verificado estruturalmente.
+
+A V4 introduz `RUNTIME_VISUAL_ASSET` e exige revisão visual/manual para assets runtime com potencial texto.
+
+### 13. “External data” foi refinado
 
 V4 separa:
 
@@ -165,11 +197,22 @@ V4 separa:
     THIRD_PARTY_EXTERNAL_DATA
     USER_DATA
     BRAND/TECHNICAL_TOKEN
+    OFFICIAL_PRODUCT_CONTENT
+    RUNTIME_VISUAL_ASSET
 
 Essa distinção evita dois erros opostos:
 
 - tentar traduzir filenames/títulos/EPG arbitrários;
 - deixar copy oficial inglesa escapar sob o rótulo genérico “external”.
+
+## Dois níveis de completude
+
+A V4 separa:
+
+- `CORE_UI_COMPLETENESS`: bloqueia promoção do shipping locale e deve chegar a 100%;
+- `PRODUCT_EXPERIENCE_COMPLETENESS`: release notes, guias oficiais, website/help e metadata de distribuição controlada pelo produto.
+
+Isso evita tanto inflar a promessa de 100% quanto excluir silenciosamente conteúdo oficial relevante.
 
 ## Novos gates
 
