@@ -104,6 +104,14 @@ Audit macOS MainMenu localization.
 
 Audit NativeLocaleStore/background notification resources.
 
+Validate locale storage architecture:
+
+- ui_locale_v1 is registered in DevicePreferences.allowedKeys;
+- ProfilePreferencePortability rejects ui_locale_v1;
+- no ui_locale_native_mirror_* key exists;
+- no new raw SharedPreferences access is introduced by i18n;
+- Android backup rules continue excluding SharedPreferences unless a deliberate policy change is reviewed.
+
 ## Gate 7 — formatters
 
 Test en and pt_BR for:
@@ -133,7 +141,8 @@ Run relevant Gradle/Robolectric tests for:
 - AndroidTvTorrentPlayerActivity;
 - TorboxTvPlayerActivity;
 - NativeLocaleBridge;
-- NativeLocaleStore;
+- NativeLocaleStore single-store contract;
+- DevicePreferences/ProfilePreferencePortability contract;
 - resource resolution;
 - process-dead Service/Receiver notification;
 - existing notification channel after locale change;
