@@ -274,3 +274,20 @@ Hardcoded `TextDirection.ltr/rtl`, alinhamentos físicos e paddings/positions le
 - third-party vendored behavior -> ownership evidence.
 
 Pseudo-RTL e Gate M validam a classificação.
+
+
+## Official product content
+
+Conteúdo acionado pelo app mas hospedado fora do binário mantém ownership do produto quando oficial.
+
+Exemplos atuais:
+
+- `release.body` renderizado via MarkdownBody;
+- WebDAV setup guide em `debrify.tv/guides/webdav-sync/`;
+- QR empacotado para esse setup guide.
+
+A arquitetura separa `CORE_UI_COMPLETENESS` de `PRODUCT_EXPERIENCE_COMPLETENESS`. Setup essencial deve ter locale policy; conteúdo editorial como release notes pode ter política separada, mas nunca ownership implícito.
+
+## Runtime visual assets
+
+SVG com texto deve ser inspecionado estruturalmente. Raster/PDF runtime com potencial copy precisa de revisão visual e classificação `RUNTIME_VISUAL_ASSET`.
