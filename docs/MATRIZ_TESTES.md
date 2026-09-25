@@ -1,4 +1,4 @@
-# Matriz de testes i18n — V2
+# Matriz de testes i18n — V3
 
 ## Locales
 
@@ -20,6 +20,9 @@
 - fresh install
 - system en
 - system pt-BR
+- system pt-PT (must not auto-map to pt-BR)
+- system pt without region
+- en-US / en-GB -> en
 - preferred locale list
 - manual en
 - manual pt-BR
@@ -29,6 +32,9 @@
 - system locale change while following system
 - system locale change with manual override
 - restart persistence
+- BCP47 persisted pt-BR vs gen_l10n pt_BR
+- corrupt native locale mirror
+- App language vs OS-owned localization boundary
 
 ## Isolation invariants
 
@@ -59,6 +65,11 @@
 | Flutter Player | yes | yes | yes | yes | |
 | AndroidTvTorrentPlayerActivity | yes | | | yes | yes |
 | TorboxTvPlayerActivity | yes | | | yes | yes |
+| Android background notifications | yes | | | yes | yes |
+| macOS MainMenu | yes | | | manual | yes |
+| Windows installer | yes | | | manual | yes |
+| Web DOM lang/dir | yes | yes | | | yes |
+| TV voice/input locale | yes | yes | | yes | yes |
 | IPTV/Debrify TV/Stremio TV | yes | yes | yes | yes | |
 | Tracking/Calendar | yes | yes | | yes | |
 | Sync/Backup/Remote | yes | yes | | yes | |
@@ -99,6 +110,18 @@ Test both native player Activities:
 4. system en + override pt-BR
 
 Verify resources, focus, dialogs, overlays and no unintended playback restart.
+
+### Android cold-start/background
+
+With Flutter process killed:
+
+1. scheduled recording alarm posts localized failure/success UI;
+2. download/recording foreground service uses NativeLocaleStore;
+3. action labels Pause/Resume/Cancel/Stop are localized;
+4. 0/1/2 summary plurals are correct;
+5. existing notification channel gets current localized name/description where Android permits;
+6. corrupt mirror falls back safely;
+7. no state decision depends on translated text.
 
 ## Layout/a11y
 
@@ -152,3 +175,19 @@ Before promoting pt-BR:
 - Android native tests pass
 - platform build matrix passes
 - PT-BR human in-context review completed
+
+
+## Voice/input locale
+
+- system-default voice remains unchanged when only App language changes
+- explicit BCP-47 reaches Android recognizer only when input policy requests it
+- PT-BR TV user can enter accented Portuguese characters through a supported path
+- recognizer unavailable/permission denied states are localized
+- transcript remains user/external data and is never translated
+
+## Artifact reachability
+
+- runtime local packages are scanned
+- dev/test/example/generated code is classified rather than silently excluded
+- SYSTEM_OWNED_UI and THIRD_PARTY_OWNED_UI findings carry ownership evidence
+- stale allowlist entry fails CI
