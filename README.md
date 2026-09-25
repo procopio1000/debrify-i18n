@@ -4,11 +4,11 @@ Projeto de planejamento e especificação para implementar internacionalização
 
 ## Estado atual
 
-**Plano canônico:** PLANO_MESTRE_V4.md
+**Plano canônico:** PLANO_MESTRE_V5.md
 
-A V4 foi re-auditada contra o upstream, o toolchain Flutter 3.44.8 e as fontes reais de copy em runtime em 2026-09-25. Ela preserva os hardenings da V3 e fecha copy remota oficial, runtime assets, rich text/custom painting, notificações de plugin não-Android e directionality hardcoded.
+A V5 foi re-auditada contra a árvore exata do upstream, o workflow de release, o toolchain Flutter 3.44.8 e as fontes reais de copy em runtime/packaging em 2026-09-25. Ela preserva os hardenings da V4 e fecha build-generated copy, app-supplied system UI, PiP Android, delegates do framework, localization fora de BuildContext, test harness e verificação dentro dos artifacts.
 
-V1, V2 e V3 permanecem no repositório apenas como histórico/audit trail.
+V1, V2, V3 e V4 permanecem no repositório apenas como histórico/audit trail.
 
 ## Alvo verificado
 
@@ -20,20 +20,22 @@ V1, V2 e V3 permanecem no repositório apenas como histórico/audit trail.
 
 ## Arquivos
 
-- PLANO_MESTRE_V4.md — plano canônico atual, toolchain/cross-runtime-verified e implementation-ready
+- PLANO_MESTRE_V5.md — plano canônico atual, toolchain/cross-runtime/packaging-verified-by-design e implementation-ready
+- PLANO_MESTRE_V4.md — histórico/superseded pela V5
 - PLANO_MESTRE_V3.md — histórico/superseded pela V4
 - PLANO_MESTRE_V2.md — histórico/superseded pela V3
 - PLANO_MESTRE_V1.md — histórico/superseded
-- docs/AUDITORIA_V4.md — quarta auditoria e evidências cross-runtime
+- docs/AUDITORIA_V5.md — quinta auditoria, packaging/app-supplied system UI e evidências
+- docs/AUDITORIA_V4.md — histórico da quarta auditoria
 - docs/AUDITORIA_V3.md — histórico da terceira auditoria
 - docs/AUDITORIA_V2.md — histórico da segunda auditoria
 - docs/AUDITORIA_BASELINE.md — evidências da auditoria inicial
-- docs/ARQUITETURA.md — arquitetura V4
+- docs/ARQUITETURA.md — arquitetura V5
 - docs/GLOSSARIO_PT_BR.md — terminologia inicial
-- docs/MATRIZ_TESTES.md — matriz de testes V4
-- docs/CI_QUALITY_GATES.md — quality gates V4
+- docs/MATRIZ_TESTES.md — matriz de testes V5
+- docs/CI_QUALITY_GATES.md — quality gates V5
 
-## O que a V4 acrescenta
+## O que a V5 consolida e acrescenta
 
 Além da infraestrutura já consolidada na V3, a V4 mantém todos os contratos anteriores e acrescenta explicitamente:
 
@@ -79,7 +81,15 @@ Além da infraestrutura já consolidada na V3, a V4 mantém todos os contratos a
 - Markdown/release notes oficiais com ownership explícito;
 - WebDAV Setup guide/link/QR com política de locale;
 - runtime visual assets com potencial texto;
-- separação entre CORE_UI_COMPLETENESS e PRODUCT_EXPERIENCE_COMPLETENESS.
+- separação entre CORE_UI_COMPLETENESS e PRODUCT_EXPERIENCE_COMPLETENESS;
+- `APP_SUPPLIED_SYSTEM_UI` para PiP/FilePicker e outras superfícies desenhadas pelo SO com copy fornecida pelo app;
+- `BUILD_GENERATED_PRODUCT_COPY` para workflow/scripts que geram metadata user-facing;
+- uma única fonte `.desktop` Linux e verificação nos AppImages x86_64/arm64;
+- `LocalizedCopyResolver` para services/background sem `BuildContext`;
+- delegates Material/Widgets/Cupertino explícitos;
+- `localizedTestApp`/test harness para evitar suite presa ao inglês;
+- resource placeholder/type parity no Android;
+- Gate N para provar localização dentro dos artifacts finais.
 
 ## Regra central
 
