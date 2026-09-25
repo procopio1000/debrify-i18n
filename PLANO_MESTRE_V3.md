@@ -511,10 +511,13 @@ Teste obrigatório: system en + override pt-BR mostra PT-BR até em migration/re
 
 V3 escolhe uma política explícita para evitar drift:
 
-- arquivos gerados por `gen_l10n` em `lib/l10n/generated/` podem ser commitados para manter imports estáveis;
+- arquivos gerados por `gen_l10n` em `lib/l10n/generated/` **devem ser versionados**;
+- o `.gitignore` atual do upstream não exclui esse diretório, portanto nenhuma exceção adicional é necessária na baseline;
 - nunca são editados manualmente;
+- todo PR que altera ARB/configuração executa `flutter gen-l10n` e inclui o diff gerado;
 - CI executa `flutter gen-l10n` e `git diff --exit-code -- lib/l10n/generated`;
-- se upstream decidir não versionar generated code, essa política deve ser alterada em um PR dedicado, com `.gitignore` e CI equivalentes; não misturar os dois modelos.
+- o arquivo gerado deve ser produzido pelo mesmo Flutter 3.44.8 pinado na baseline;
+- se upstream decidir futuramente não versionar generated code, essa política só muda em um PR arquitetural dedicado, alterando `.gitignore`, imports/build e CI em conjunto; não misturar os dois modelos.
 
 ## 3.9 Web locale bridge
 
