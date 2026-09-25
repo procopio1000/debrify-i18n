@@ -4,11 +4,11 @@ Projeto de planejamento e especificação para implementar internacionalização
 
 ## Estado atual
 
-**Plano canônico:** PLANO_MESTRE_V3.md
+**Plano canônico:** PLANO_MESTRE_V4.md
 
-A V3 foi re-auditada contra o upstream e contra o toolchain Flutter 3.44.8 em 2026-09-25. Ela fecha blockers de dependência, runtime nativo em background, ownership de locale por plataforma, Windows/macOS/Web e scan por reachability que ainda estavam subespecificados na V2.
+A V4 foi re-auditada contra o upstream, o toolchain Flutter 3.44.8 e as fontes reais de copy em runtime em 2026-09-25. Ela preserva os hardenings da V3 e fecha copy remota oficial, runtime assets, rich text/custom painting, notificações de plugin não-Android e directionality hardcoded.
 
-V1 e V2 permanecem no repositório apenas como histórico/audit trail.
+V1, V2 e V3 permanecem no repositório apenas como histórico/audit trail.
 
 ## Alvo verificado
 
@@ -20,20 +20,22 @@ V1 e V2 permanecem no repositório apenas como histórico/audit trail.
 
 ## Arquivos
 
-- PLANO_MESTRE_V3.md — plano canônico atual, toolchain-verified e implementation-ready
+- PLANO_MESTRE_V4.md — plano canônico atual, toolchain/cross-runtime-verified e implementation-ready
+- PLANO_MESTRE_V3.md — histórico/superseded pela V4
 - PLANO_MESTRE_V2.md — histórico/superseded pela V3
 - PLANO_MESTRE_V1.md — histórico/superseded
-- docs/AUDITORIA_V3.md — terceira auditoria e evidências bloqueadoras
+- docs/AUDITORIA_V4.md — quarta auditoria e evidências cross-runtime
+- docs/AUDITORIA_V3.md — histórico da terceira auditoria
 - docs/AUDITORIA_V2.md — histórico da segunda auditoria
 - docs/AUDITORIA_BASELINE.md — evidências da auditoria inicial
-- docs/ARQUITETURA.md — arquitetura V3
+- docs/ARQUITETURA.md — arquitetura V4
 - docs/GLOSSARIO_PT_BR.md — terminologia inicial
-- docs/MATRIZ_TESTES.md — matriz de testes V3
-- docs/CI_QUALITY_GATES.md — quality gates V3
+- docs/MATRIZ_TESTES.md — matriz de testes V4
+- docs/CI_QUALITY_GATES.md — quality gates V4
 
-## O que a V3 acrescenta
+## O que a V4 acrescenta
 
-Além da infraestrutura já consolidada na V2, a V3 cobre explicitamente:
+Além da infraestrutura já consolidada na V3, a V4 mantém todos os contratos anteriores e acrescenta explicitamente:
 
 - ShippingLocales separado dos locales gerados;
 - SettingsRows e Settings Search localizados por identidade estável;
@@ -64,6 +66,16 @@ Além da infraestrutura já consolidada na V2, a V3 cobre explicitamente:
 - locale de voz/input independente;
 - bidi isolation;
 - evidência mínima reproduzível por PR.
+- `REMOTE_PRODUCT_COPY` para campanhas/suporte oficiais;
+- contrato locale-aware para catálogo remoto oficial de engines;
+- runtime assets JSON/YAML/Markdown/CSV no grafo de reachability;
+- notificações `background_downloader` fora do Android nativo;
+- `Text.rich`/`TextSpan`/`TextPainter`/CustomPainter como sinks de UI;
+- rich text reorder-safe por placeholders semânticos;
+- autônimos estáveis no seletor de idioma;
+- Gate L para copy remota/runtime;
+- Gate M para directionality e inline-text safety;
+- completeness report além de ARB/native resources.
 
 ## Regra central
 
