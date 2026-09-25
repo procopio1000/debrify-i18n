@@ -171,7 +171,7 @@ A extensão pode rodar sem Flutter. Seus títulos/sinopses atuais são majoritar
 
 **Correção incorporada na V3:**
 
-- suporte PT-BR no installer;
+- suporte PT-BR no installer; o workflow usa Inno Setup 6 e a entrada esperada é baseada em `compiler:Languages\\BrazilianPortuguese.isl`;
 - custom messages/tasks localizados;
 - teste installer en/PT-BR;
 - remoção de metadata template.
