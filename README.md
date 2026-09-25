@@ -4,11 +4,11 @@ Projeto de planejamento e especificação para implementar internacionalização
 
 ## Estado atual
 
-**Plano canônico:** PLANO_MESTRE_V2.md
+**Plano canônico:** PLANO_MESTRE_V3.md
 
-A V2 foi re-auditada contra o upstream em 2026-09-25 e corrige lacunas do V1, incluindo o fato de que PLANO_MESTRE_V1.md estava truncado no início da Fase 10.
+A V3 foi re-auditada contra o upstream e contra o toolchain Flutter 3.44.8 em 2026-09-25. Ela fecha blockers de dependência, runtime nativo em background, ownership de locale por plataforma, Windows/macOS/Web e scan por reachability que ainda estavam subespecificados na V2.
 
-O V1 permanece no repositório apenas como histórico.
+V1 e V2 permanecem no repositório apenas como histórico/audit trail.
 
 ## Alvo verificado
 
@@ -20,18 +20,20 @@ O V1 permanece no repositório apenas como histórico.
 
 ## Arquivos
 
-- PLANO_MESTRE_V2.md — plano atual, completo e implementation-ready
+- PLANO_MESTRE_V3.md — plano canônico atual, toolchain-verified e implementation-ready
+- PLANO_MESTRE_V2.md — histórico/superseded pela V3
 - PLANO_MESTRE_V1.md — histórico/superseded
-- docs/AUDITORIA_V2.md — reauditoria e achados adicionais
+- docs/AUDITORIA_V3.md — terceira auditoria e evidências bloqueadoras
+- docs/AUDITORIA_V2.md — histórico da segunda auditoria
 - docs/AUDITORIA_BASELINE.md — evidências da auditoria inicial
-- docs/ARQUITETURA.md — arquitetura V2
+- docs/ARQUITETURA.md — arquitetura V3
 - docs/GLOSSARIO_PT_BR.md — terminologia inicial
-- docs/MATRIZ_TESTES.md — matriz de testes V2
-- docs/CI_QUALITY_GATES.md — quality gates V2
+- docs/MATRIZ_TESTES.md — matriz de testes V3
+- docs/CI_QUALITY_GATES.md — quality gates V3
 
-## O que a V2 acrescenta
+## O que a V3 acrescenta
 
-Além da infraestrutura Flutter/ARB original, a V2 cobre explicitamente:
+Além da infraestrutura já consolidada na V2, a V3 cobre explicitamente:
 
 - ShippingLocales separado dos locales gerados;
 - SettingsRows e Settings Search localizados por identidade estável;
@@ -50,6 +52,18 @@ Além da infraestrutura Flutter/ARB original, a V2 cobre explicitamente:
 - teclado/input TV;
 - rollout, rollback e PR strategy;
 - Definition of Done mensurável.
+- compatibilidade real `flutter_localizations` / `intl 0.20.2` no Flutter 3.44.8;
+- remoção de `synthetic-package` obsoleto;
+- NativeLocaleStore para Services/Receivers Android sem Flutter ativo;
+- remoção de lógica nativa baseada em frases inglesas;
+- scan de XML Android e packages runtime por reachability;
+- ownership matrix para superfícies controladas pelo SO;
+- macOS MainMenu;
+- Windows installer PT-BR e limpeza de `com.example`;
+- Web `lang`/`dir` em runtime;
+- locale de voz/input independente;
+- bidi isolation;
+- evidência mínima reproduzível por PR.
 
 ## Regra central
 
