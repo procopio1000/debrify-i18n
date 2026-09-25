@@ -70,6 +70,8 @@
 | Remote product copy | yes | yes | | | yes |
 | Runtime asset copy | yes | yes | | | yes |
 | Rich text/custom painting | yes | yes | yes | yes | |
+| Markdown/release notes | yes | yes | yes | | |
+| Official WebDAV setup guide/QR | yes | yes | | yes | |
 | macOS MainMenu | yes | | | manual | yes |
 | Windows installer | yes | | | manual | yes |
 | Web DOM lang/dir | yes | yes | | | yes |
@@ -219,7 +221,12 @@ Before promoting pt-BR:
 - official engine catalogue has a pt-BR editorial path;
 - third-party imported engine copy remains external data;
 - runtime JSON/YAML/CSV/Markdown reaching UI is inventoried;
-- offline mode preserves a deterministic locale fallback.
+- offline mode preserves a deterministic locale fallback;
+- release.body has explicit OFFICIAL_PRODUCT_CONTENT ownership;
+- fixed release-note fallback chrome is localized;
+- WebDAV setup guide link/QR destination has a documented locale policy;
+- one stable QR can reach a locale-negotiating landing page or equivalent;
+- visual runtime assets with potential text are reviewed/classified.
 
 ## V4 rich text/custom painting
 
