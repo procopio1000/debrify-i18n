@@ -1,4 +1,4 @@
-# Arquitetura i18n — V2
+# Arquitetura i18n — V3
 
 ## Stack
 
@@ -16,6 +16,9 @@
 - NativeLocaleBridge
 - native resources per platform
 - CI completeness and semantic-coupling gates
+- NativeLocaleStore Android para components sem Flutter
+- WebLocaleBridge para DOM lang/dir
+- ownership matrix OS/app/third-party
 
 ## Authorities
 
@@ -37,7 +40,7 @@ No authority implicitly writes another.
 
 BCP 47 is the persisted representation.
 
-V2 policy: App language is device-local.
+V3 policy: App language is device-local.
 
 It is not profile-scoped and is not synchronized through WebDAV.
 
@@ -130,6 +133,72 @@ manifest/index metadata are part of the product shell and must not retain Flutte
 ### Windows/Linux
 
 Native runner copy is inventoried and either localized or explicitly classified as brand/technical.
+
+## Toolchain contract
+
+Baseline atual:
+
+    Flutter 3.44.8
+    flutter_localizations -> intl 0.20.2
+
+O projeto deve atualizar a dependência direta de intl para constraint compatível com 0.20.2 no mesmo PR que adiciona flutter_localizations.
+
+`synthetic-package` não deve existir em l10n.yaml no Flutter 3.44.8.
+
+## Platform locale ownership
+
+| Surface | Locale source |
+|---|---|
+| Flutter UI | AppLocaleController |
+| Android Activity own UI | NativeLocaleStore mirror |
+| Android Service/Receiver/notification | NativeLocaleStore mirror |
+| Apple Flutter body | AppLocaleController |
+| Apple InfoPlist/permission prompt | bundle/system/per-app language |
+| macOS native menu | bundle localization |
+| tvOS Top Shelf | bundle/system + extension snapshot/data |
+| Windows installer | installer/system language |
+| Web DOM lang/dir | AppLocaleController mirror |
+
+NativeLocaleStore is not a second authority. Dart writes it; background native components only read it.
+
+## Android cold-start locale
+
+Persistent mirror:
+
+    ui_locale_native_mirror_v1 = system | BCP47
+
+Requirements:
+
+- validate on Dart side;
+- atomic write;
+- safe fallback;
+- localized Context before view/notification construction;
+- Activities, Services and Receivers covered;
+- notification channel name/description re-upserted safely;
+- no display string used as state.
+
+## Native state model
+
+Download/recording services must expose enums/reason codes internally.
+
+Localized Android strings are produced only at notification/view boundaries. Branching on English phrases is forbidden.
+
+## Web document contract
+
+At bootstrap and each App language change:
+
+    document.documentElement.lang = effective BCP47
+    document.documentElement.dir = ltr | rtl
+
+## Input/speech authority
+
+Speech/input language is independent of UI language. System default remains the initial authority unless a separate user preference is introduced.
+
+## Artifact-reachability scan
+
+Owned runtime code in lib/, native platform roots and runtime packages/ is in scope.
+
+dev/, tests, examples, generated code and third-party UI are classified, not blindly ignored.
 
 ## Failure behavior
 
