@@ -100,6 +100,9 @@ A quarta auditoria percorreu não só source files tradicionais, mas também loa
 10. **Fallback inglês não conta como completude para copy remota própria.** Se um payload oficial não tiver PT-BR, ele pode cair para inglês por segurança, mas o release gate deve registrar isso como lacuna de localização, não como sucesso.
 11. **Copy remota e dados de terceiros exigem trust boundaries diferentes.** Título de filme, filename, EPG e descrição fornecida por addon do usuário continuam dados externos; campanha, onboarding oficial e copy de suporte mantida pelo produto são responsabilidade de localização.
 12. **A evidência de release precisa abranger runtime copy.** ARB/resource parity é necessário, mas não suficiente; o relatório de completude precisa somar ARB + native resources + product-owned remote/runtime copy + allowlists.
+13. **Conteúdo oficial externo precisa de ownership explícito.** O app abre `https://debrify.tv/guides/webdav-sync/` e empacota um QR para a mesma URL. Mesmo fora do binário, uma instrução oficial acionada pela UI não deve cair silenciosamente na categoria “third-party data”.
+14. **Release notes oficiais são renderizadas dentro do app.** `release.body` é exibido por `MarkdownBody` em `main.dart` e `settings_screen.dart`. Isso exige classificar Markdown/renderers e definir política para conteúdo editorial oficial.
+15. **Assets visuais podem conter texto sem aparecer em source scan.** SVG pode ser analisado estruturalmente; PNG/JPG/PDF usados no runtime precisam de inventário visual/manual quando puderem carregar copy.
 
 ---
 
@@ -292,6 +295,8 @@ Toda string que chega à tela deve ter owner explícito. A V4 adiciona estas cla
 | `THIRD_PARTY_EXTERNAL_DATA` | addon/EPG/provider externo | não traduzir localmente por padrão |
 | `USER_DATA` | profile, filename, playlist | nunca traduzir automaticamente |
 | `BRAND/TECHNICAL_TOKEN` | Debrify, Trakt, HDR, URL | preservar conforme glossário |
+| `OFFICIAL_PRODUCT_CONTENT` | release notes, guia oficial, help/docs acionados pelo app | locale policy explícita; não confundir com third-party |
+| `RUNTIME_VISUAL_ASSET` | PNG/JPG/SVG/PDF com texto embutido | localizar variante ou classificar como brand/technical |
 
 Regras:
 
@@ -300,7 +305,9 @@ Regras:
 - payload remoto nunca escolhe a autoridade de App language;
 - locale solicitado/selecionado é enviado como BCP-47 somente quando o contrato remoto suporta locale;
 - cache de remote config não pode “congelar” copy do locale anterior; preferir payload multilíngue versionado ou cache por locale;
-- resposta remota desconhecida/malformada nunca impede startup.
+- resposta remota desconhecida/malformada nunca impede startup;
+- conteúdo oficial externo acionado pelo app declara se faz parte de CORE_UI_COMPLETENESS ou PRODUCT_EXPERIENCE_COMPLETENESS;
+- setup/help essencial para concluir uma tarefa não pode ser excluído de cobertura apenas porque abre no browser.
 
 Para `SupportRemoteConfig`, política preferida:
 
@@ -320,6 +327,38 @@ Exemplo:
     pt-BR  -> Português (Brasil)
 
 Isso evita que o usuário precise entender o idioma atualmente ativo para conseguir trocar de idioma.
+
+## 2.11 Dois níveis de completude
+
+Para evitar uma definição ambígua de “100%”, a V4 separa:
+
+### CORE_UI_COMPLETENESS — bloqueia ShippingLocales
+
+Inclui:
+
+- Flutter/native app chrome;
+- messages/errors/settings;
+- remote product copy renderizada como UI;
+- runtime asset copy;
+- notifications;
+- accessibility;
+- setup instructions indispensáveis renderizadas no app.
+
+Meta: 100%.
+
+### PRODUCT_EXPERIENCE_COMPLETENESS — cobertura oficial adjacente
+
+Inclui:
+
+- release notes oficiais exibidas em Markdown;
+- guias oficiais abertos pelo app;
+- website/help acionado diretamente por uma tarefa do app;
+- store/release metadata quando controlada pelo projeto.
+
+Para o fluxo WebDAV, como o app oferece `Setup guide` e um QR fixo para `debrify.tv/guides/webdav-sync/`, o destino deve ter política de locale. Preferir URL estável com content negotiation/locale picker ou URL derivada do locale efetivo. O QR não deve precisar ser regenerado por idioma se o landing page negociar locale.
+
+Release notes podem ser publicadas em formato multilíngue ou via source locale-aware. Se o produto decidir que release notes são editoriais e não bloqueiam o shipping locale, essa exceção precisa ser explícita e mensurada — nunca implícita.
+
 
 ---
 
@@ -599,6 +638,8 @@ O scanner e a arquitetura devem cobrir:
 - `RichText`;
 - `TextSpan`/`InlineSpan`;
 - `TextPainter`;
+- `MarkdownBody`/`Markdown` e outros renderers de conteúdo rico;
+- `WidgetSpan` e spans com gestures;
 - texto desenhado por `CustomPainter`;
 - labels passados como parâmetro para painters/idents;
 - strings calculadas que chegam a esses sinks.
@@ -625,6 +666,28 @@ Launch idents/custom painted copy devem ser classificados individualmente em:
 - `TECHNICAL_TOKEN`.
 
 “Está desenhado no canvas” nunca é razão suficiente para sair do inventário.
+
+## 3.11 Markdown, release notes e conteúdo rico remoto
+
+`MarkdownBody(data: ...)` é sink de UI mesmo quando o texto vem de rede.
+
+Casos confirmados:
+
+    lib/main.dart
+    lib/screens/settings_screen.dart
+
+com `release.body`.
+
+Política:
+
+- chrome ao redor do Markdown usa ARB;
+- fallback local como “Release notes will appear here...” usa ARB;
+- body oficial recebe classificação `OFFICIAL_PRODUCT_CONTENT`;
+- links dentro de Markdown mantêm URL como dado e localized accessible label quando o app fornecer label próprio;
+- sanitize/security continua independente de i18n;
+- não traduzir Markdown arbitrário de terceiros automaticamente;
+- se release notes fizerem parte da experiência localizada, publicar variante pt-BR por contrato editorial/endpoint.
+
 
 ---
 
@@ -1545,6 +1608,9 @@ O inventário deve incluir:
 - TextPainter e copy desenhada em CustomPainter/Canvas;
 - runtime-loaded JSON/YAML/CSV/Markdown e outros assets que alimentem UI;
 - copy de remote config/endpoints oficiais;
+- MarkdownBody/Markdown que renderizam conteúdo remoto/oficial;
+- links/QR para guias oficiais acionados por fluxos do app;
+- SVG text e inventário manual de raster/PDF runtime assets com potencial copy;
 - notification copy configurada por plugins.
 
 ## 9.1 Escopo por reachability do artefato
@@ -1813,6 +1879,7 @@ Marcas permanecem marcas.
 Cobrir:
 
 - WebDAV sync;
+- Setup guide WebDAV + link/QR + locale negotiation do conteúdo oficial;
 - local backup;
 - restore;
 - migrate;
@@ -1895,7 +1962,9 @@ Somente agora:
 - validar profile switch;
 - validar sync;
 - validar player nativo;
-- validar todos os artifacts.
+- validar todos os artifacts;
+- validar política de locale para release notes oficiais e guias acionados pelo app;
+- publicar/registrar cobertura PRODUCT_EXPERIENCE_COMPLETENESS.
 
 ---
 
@@ -1986,7 +2055,10 @@ Detectar não apenas Text, mas:
 - TextPainter/CustomPainter/Canvas text;
 - TaskNotification/background_downloader e outros plugin notification builders;
 - runtime asset copy em JSON/YAML/CSV/Markdown alcançável;
-- remote product copy fallback/consumer paths.
+- remote product copy fallback/consumer paths;
+- MarkdownBody/Markdown sources;
+- official product links/QR/help destinations;
+- visual runtime assets com texto embutido (SVG estrutural + revisão manual para raster/PDF).
 
 ## Gate E — Semantic coupling
 
@@ -2078,6 +2150,8 @@ O relatório de completeness deve separar:
     remote product copy
     product-controlled remote catalog
     runtime asset copy
+    official product content
+    runtime visual assets
     approved external/user data
 
 ## Gate M — Directionality and inline-text safety
@@ -2154,7 +2228,10 @@ Teste de pseudo-RTL deve incluir rich text, dados LTR interpolados e medição d
 - catálogo oficial de engines apresenta descrição PT-BR quando shipping;
 - engine de terceiro continua dado externo;
 - offline mantém contrato previsível sem congelar locale anterior;
-- completeness report acusa fallback inglês de copy oficial.
+- completeness report acusa fallback inglês de copy oficial;
+- release.body/Markdown tem ownership explícito e fallback chrome localizado;
+- Setup guide WebDAV usa destino com locale policy sem exigir QR diferente por idioma;
+- conteúdo oficial essencial acionado pelo app não é confundido com third-party data.
 
 ## Rich text / custom painting
 
@@ -2506,6 +2583,10 @@ O trabalho está concluído somente quando TODOS os itens abaixo forem verdadeir
 - [ ] Text.rich/RichText/TextSpan/TextPainter/CustomPainter user-facing estão localizados ou classificados.
 - [ ] Hardcoded directionality app-owned possui zero findings não classificados.
 - [ ] Language picker usa autônimos estáveis.
+- [ ] MarkdownBody/Markdown user-facing possui source ownership/classification.
+- [ ] Release notes oficiais possuem política editorial de locale registrada.
+- [ ] WebDAV Setup guide/link/QR possui destino com política de locale.
+- [ ] Runtime visual assets com potencial texto foram auditados/classificados.
 - [ ] Formatters são locale-aware onde aplicável.
 - [ ] Android native values-pt-rBR completo.
 - [ ] Zero android:text/contentDescription literal user-facing fora de allowlist.
@@ -2624,4 +2705,4 @@ Cada PR deve anexar, conforme aplicável:
 - build artifact correspondente;
 - limitações OS-owned registradas.
 
-A meta da V4 é transformar “100%” de uma promessa subjetiva em um conjunto auditável de provas reproduzíveis que cobre source code, plataformas nativas, assets de runtime e copy oficial remota.
+A meta da V4 é transformar “100%” de uma promessa subjetiva em um conjunto auditável de provas reproduzíveis que cobre source code, plataformas nativas, assets de runtime, copy oficial remota e conteúdo oficial acionado pelo produto.
