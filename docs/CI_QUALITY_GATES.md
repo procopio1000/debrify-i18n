@@ -1,4 +1,26 @@
-# Quality Gates i18n — V2
+# Quality Gates i18n — V3
+
+## Gate 0 — dependency compatibility
+
+Baseline:
+
+    Flutter 3.44.8
+    flutter_localizations -> intl 0.20.2
+
+Run:
+
+    flutter --version
+    flutter pub get
+    flutter pub deps
+    flutter gen-l10n
+
+Fail if:
+
+- intl does not resolve 0.20.2 under the pinned baseline;
+- dependency_overrides masks intl;
+- l10n.yaml contains synthetic-package;
+- gen-l10n emits an unexpected warning;
+- lockfile drift is unexplained.
 
 ## Gate 1 — pinned toolchain
 
@@ -7,7 +29,7 @@ Use the same Flutter version as upstream CI.
     flutter pub get
     flutter gen-l10n
 
-Generation must be reproducible.
+Generation must be reproducible. When generated localization source is committed, run `git diff --exit-code -- lib/l10n/generated` after generation.
 
 ## Gate 2 — ARB schema and parity
 
@@ -44,8 +66,13 @@ Scan beyond Text(...):
 - tooltip/hint;
 - Semantics;
 - native setText/contentDescription/Toast/dialogs;
+- Android XML android:text/contentDescription/hint;
+- NotificationCompat title/text/action/channel;
+- Services/Receivers that can run without Flutter;
+- macOS native menu copy;
+- Windows installer copy;
 - plist permission descriptions;
-- web shell metadata.
+- web shell metadata and DOM lang/dir.
 
 All exceptions require a versioned reason.
 
@@ -69,7 +96,13 @@ Audit Apple InfoPlist.strings/project localizations.
 
 Audit tvOS Top Shelf resources.
 
-Audit Web manifest/index.
+Audit Web manifest/index and runtime lang/dir.
+
+Audit Windows installer language/custom messages and Runner.rc metadata.
+
+Audit macOS MainMenu localization.
+
+Audit NativeLocaleStore/background notification resources.
 
 ## Gate 7 — formatters
 
@@ -99,8 +132,13 @@ Run relevant Gradle/Robolectric tests for:
 
 - AndroidTvTorrentPlayerActivity;
 - TorboxTvPlayerActivity;
-- locale bridge;
-- resource resolution.
+- NativeLocaleBridge;
+- NativeLocaleStore;
+- resource resolution;
+- process-dead Service/Receiver notification;
+- existing notification channel after locale change;
+- notification actions/plurals;
+- zero branch based on localized/display text.
 
 ## Gate 11 — layout/a11y
 
@@ -122,4 +160,9 @@ Do not add PT-BR to ShippingLocales until:
 - native resources = 100%;
 - semantic coupling findings = 0;
 - unapproved hardcoded UI findings = 0;
-- platform and critical runtime tests pass.
+- platform and critical runtime tests pass;
+- Windows installer pt-BR passes;
+- macOS menu pt-BR passes;
+- Web lang/dir passes;
+- background Android locale after process death passes;
+- stale allowlist entries = 0.
