@@ -76,6 +76,10 @@ Além da infraestrutura já consolidada na V3, a V4 mantém todos os contratos a
 - Gate L para copy remota/runtime;
 - Gate M para directionality e inline-text safety;
 - completeness report além de ARB/native resources.
+- Markdown/release notes oficiais com ownership explícito;
+- WebDAV Setup guide/link/QR com política de locale;
+- runtime visual assets com potencial texto;
+- separação entre CORE_UI_COMPLETENESS e PRODUCT_EXPERIENCE_COMPLETENESS.
 
 ## Regra central
 
