@@ -120,8 +120,9 @@ With Flutter process killed:
 3. action labels Pause/Resume/Cancel/Stop are localized;
 4. 0/1/2 summary plurals are correct;
 5. existing notification channel gets current localized name/description where Android permits;
-6. corrupt mirror falls back safely;
-7. no state decision depends on translated text.
+6. corrupt/unknown ui_locale_v1 falls back safely;
+7. NativeLocaleStore reads the same canonical preference and no mirror key exists;
+8. no state decision depends on translated text.
 
 ## Layout/a11y
 
@@ -184,6 +185,17 @@ Before promoting pt-BR:
 - PT-BR TV user can enter accented Portuguese characters through a supported path
 - recognizer unavailable/permission denied states are localized
 - transcript remains user/external data and is never translated
+
+## Device preference / portability
+
+- ui_locale_v1 is accepted by DevicePreferences
+- raw SharedPreferences access count/source guard does not regress
+- ProfilePreferencePortability rejects ui_locale_v1
+- profile switch leaves app language unchanged
+- WebDAV/portable profile backup does not contain ui_locale_v1
+- Android cloud/device transfer remains excluded by current backup rules
+- app/device reset leaves no orphan native locale state
+- tvOS shared_preferences_tvos can read/write the small device key safely
 
 ## Artifact reachability
 
