@@ -1100,12 +1100,15 @@ Se houver conflito, manter o AppLocaleController como autoridade do produto e us
 Cobrir:
 
 - localizations declaradas no projeto Xcode;
+- `knownRegions`/PBXVariantGroup atualizados;
 - InfoPlist.strings;
 - NSLocalNetworkUsageDescription;
 - qualquer permission usage description adicional presente/futura;
 - app display strings que realmente forem localizáveis;
 - share/action extensions se surgirem;
 - launch/recovery surfaces.
+
+A baseline atual de iOS, tvOS e macOS possui `knownRegions = (en, Base)`; PT-BR precisa ser adicionado explicitamente aos três projetos e os arquivos localizados devem pertencer aos Variant Groups/targets corretos.
 
 App Store só deve anunciar locale que esteja shipping.
 
@@ -1171,7 +1174,11 @@ A auditoria V3 confirmou:
 
 Requisitos:
 
-- adicionar suporte PT-BR ao Inno Setup usando o language pack compatível com a versão do runner;
+- o workflow instala Inno Setup 6; adicionar no `[Languages]` a entrada PT-BR usando o language pack padrão dessa instalação, por exemplo:
+  
+      Name: "brazilianportuguese"; MessagesFile: "compiler:Languages\\BrazilianPortuguese.isl"
+
+- o job Windows deve validar que esse arquivo existe no runner antes de chamar ISCC;
 - localizar custom installer messages/tasks;
 - manter nomes de protocolos/brand quando técnicos;
 - validar instalador em sistema pt-BR e inglês;
@@ -2107,6 +2114,7 @@ O trabalho está concluído somente quando TODOS os itens abaixo forem verdadeir
 - [ ] Ambas Activities nativas principais do player testadas.
 - [ ] NativeLocaleBridge testado.
 - [ ] iOS InfoPlist strings/localizations revisados.
+- [ ] iOS/tvOS/macOS knownRegions incluem PT-BR e Variant Groups/target membership estão corretos.
 - [ ] tvOS Runner/Top Shelf revisados.
 - [ ] macOS InfoPlist strings/localizations revisados.
 - [ ] macOS MainMenu localizado para PT-BR.
