@@ -73,7 +73,22 @@ Foram confirmadas superfícies user-facing em componentes que podem executar sem
 
 Um bridge baseado apenas em Activity/Intent não cobre cold-start, alarmes ou process death.
 
-**Correção incorporada na V3:** `NativeLocaleStore`, espelho nativo read-only da autoridade Dart, com fallback seguro e teste após process kill/reboot.
+**Correção incorporada na V3:** usar a preferência canônica `ui_locale_v1` em `DevicePreferences.allowedKeys` e um `NativeLocaleStore` que leia o mesmo backing store. Não criar mirror duplicado. O projeto já possui `DevicePreferences` para estado device-owned, e `ProfilePreferencePortability` exclui automaticamente suas keys de backup/transfer de perfil.
+
+### 3.1 Storage de locale precisa seguir a arquitetura de perfis
+
+O Debrify já possui `DevicePreferences.allowedKeys` com rejeição explícita de chaves device-owned não registradas. Também existe source-guard para raw `SharedPreferences.getInstance()` e a portabilidade de perfil rejeita keys presentes em `DevicePreferences.allowedKeys`.
+
+Além disso, Android `backup_rules.xml` e `data_extraction_rules.xml` excluem todos os SharedPreferences de cloud backup e device transfer.
+
+**Correção incorporada na V3:**
+
+- registrar `ui_locale_v1` em `DevicePreferences.allowedKeys`;
+- AppLocaleController usa `DevicePreferences`;
+- `ProfilePreferencePortability.allowsKey('ui_locale_v1') == false`;
+- NativeLocaleStore Android lê a mesma preferência física;
+- sem `ui_locale_native_mirror_*`;
+- testes/source-guards garantem que locale não migra para storage profile-scoped.
 
 ### 4. Lógica nativa depende de frases inglesas
 
