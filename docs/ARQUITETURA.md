@@ -1,4 +1,4 @@
-# Arquitetura i18n — V3
+# Arquitetura i18n — V4
 
 ## Stack
 
@@ -19,6 +19,10 @@
 - NativeLocaleStore Android para components sem Flutter
 - WebLocaleBridge para DOM lang/dir
 - ownership matrix OS/app/third-party
+- RemoteProductCopy contract/resolver
+- runtime asset copy inventory
+- reorder-safe localized rich text
+- directionality static gate
 
 ## Authorities
 
@@ -40,7 +44,7 @@ No authority implicitly writes another.
 
 BCP 47 is the persisted representation.
 
-V3 policy: App language is an installation/device setting.
+V4 policy: App language is an installation/device setting.
 
 It is stored as `ui_locale_v1` through `DevicePreferences`, must be registered in `DevicePreferences.allowedKeys`, is not profile-scoped and is excluded from WebDAV/profile portability by `ProfilePreferencePortability`.
 
@@ -217,3 +221,56 @@ Locale corruption or localization failure must never block:
 - playback recovery.
 
 Fallback is always deterministic, with English available.
+
+
+## Product-copy ownership V4
+
+A origem física da string não decide se ela deve ser localizada. O owner decide.
+
+| Classe | Exemplo | Política |
+|---|---|---|
+| LOCAL_PRODUCT_COPY | Settings/player chrome | ARB/native resource |
+| REMOTE_PRODUCT_COPY | campanha/suporte oficial | schema locale-aware |
+| PRODUCT_CONTROLLED_REMOTE_CATALOG | descrição oficial de engine | schema locale-aware ou mapper versionado |
+| THIRD_PARTY_EXTERNAL_DATA | addon/EPG/provider | preservar por padrão |
+| USER_DATA | filename/profile/playlist | preservar |
+| BRAND/TECHNICAL_TOKEN | Debrify/HDR/URL | glossário/classificação |
+
+`SupportRemoteConfig` deve manter IDs, URLs, timing e providers como dados, mover fixed Settings copy para ARB e transportar campanha dinâmica por locale. Fallback inglês é seguro em runtime, mas não satisfaz completeness de pt-BR.
+
+## Runtime asset graph
+
+O inventário inclui não só source files, mas também assets capazes de produzir UI:
+
+    pubspec/asset manifest
+      -> rootBundle/loaders
+      -> JSON/YAML/CSV/Markdown/fallback config
+      -> presentation sink
+
+Asset user-facing sem owner/classification é finding.
+
+## Rich text contract
+
+`Text.rich`, `RichText`, `TextSpan`, `InlineSpan`, `TextPainter` e texto desenhado por custom painters são presentation sinks.
+
+Frases com trechos estilizados/clicáveis devem permitir que o locale determine a ordem dos placeholders. Não concatenar fragmentos na ordem inglesa quando o idioma alvo puder reordená-los.
+
+## Language picker identity
+
+O catálogo de locales guarda autônimos estáveis:
+
+    en    -> English
+    pt-BR -> Português (Brasil)
+
+O autônimo é parte da especificação do locale, não uma tradução dependente do idioma atual.
+
+## Directionality classification
+
+Hardcoded `TextDirection.ltr/rtl`, alinhamentos físicos e paddings/positions left/right em código app-owned precisam ser classificados:
+
+- semantic directional -> migrar para Directionality/start/end;
+- physical media geometry -> pode permanecer;
+- brand/art direction -> allowlist justificada;
+- third-party vendored behavior -> ownership evidence.
+
+Pseudo-RTL e Gate M validam a classificação.
