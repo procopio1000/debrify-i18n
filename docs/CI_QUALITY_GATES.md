@@ -1,4 +1,4 @@
-# Quality Gates i18n — V3
+# Quality Gates i18n — V4
 
 ## Gate 0 — dependency compatibility
 
@@ -72,7 +72,12 @@ Scan beyond Text(...):
 - macOS native menu copy;
 - Windows installer copy;
 - plist permission descriptions;
-- web shell metadata and DOM lang/dir.
+- web shell metadata and DOM lang/dir;
+- Text.rich/RichText/TextSpan/InlineSpan;
+- TextPainter/CustomPainter/Canvas text;
+- TaskNotification/background_downloader copy;
+- runtime-loaded JSON/YAML/CSV/Markdown que alimenta UI;
+- remote product copy e fallback assets.
 
 All exceptions require a versioned reason.
 
@@ -161,7 +166,32 @@ Test:
 - TV D-pad/focus;
 - Semantics/contentDescription.
 
-## Gate 12 — release
+## Gate 12 — remote/runtime product copy
+
+Fail or block promotion when:
+
+- product-owned remote field is user-facing but has no locale policy;
+- shipping locale falls back to English for official campaign/support copy;
+- official engine-catalog editorial copy has no pt-BR path;
+- cached remote copy can retain the previous locale variant;
+- a runtime asset reaches UI without inventory/classification;
+- fixed Settings copy still comes from English remote config instead of ARB.
+
+Completeness report must expose ARB, native resources, remote product copy, product-controlled remote catalog and runtime asset copy separately.
+
+## Gate 13 — directionality and inline-text safety
+
+Report app-owned runtime occurrences of:
+
+- hardcoded TextDirection.ltr/rtl;
+- Alignment left/right;
+- semantic EdgeInsets/Positioned using physical left/right;
+- directional icons;
+- TextSpan fragment ordering that assumes English grammar.
+
+Every finding must be fixed or allowlisted with physical/brand/third-party justification. Pseudo-RTL must cover rich text and mixed-direction data.
+
+## Gate 14 — release
 
 Do not add PT-BR to ShippingLocales until:
 
@@ -174,4 +204,8 @@ Do not add PT-BR to ShippingLocales until:
 - macOS menu pt-BR passes;
 - Web lang/dir passes;
 - background Android locale after process death passes;
-- stale allowlist entries = 0.
+- stale allowlist entries = 0;
+- remote product copy completeness = 100% for shipping pt-BR;
+- runtime asset findings unclassified = 0;
+- hardcoded directionality findings unclassified = 0;
+- rich-text/custom-painter findings unclassified = 0.
