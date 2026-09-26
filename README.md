@@ -46,9 +46,9 @@ Contagem estrutural não significa que todo arquivo contém UI; reachability e o
 ## Arquivos normativos
 
 - `PLANO_MESTRE_V9.md` — fonte canônica de implementação
-- `docs/ARQUITETURA.md` — arquitetura V8
-- `docs/CI_QUALITY_GATES.md` — gates V8 com IDs canônicos
-- `docs/MATRIZ_TESTES.md` — matriz V8
+- `docs/ARQUITETURA.md` — arquitetura V9
+- `docs/CI_QUALITY_GATES.md` — gates V9 com IDs canônicos
+- `docs/MATRIZ_TESTES.md` — matriz V9
 - `docs/AUDIT_BASELINE_MANIFEST.json` — baseline machine-readable
 - `docs/AUDIT_HOTSPOTS_V9.json` — hotspots confirmados machine-readable
 - `docs/GLOSSARIO_PT_BR.md` — terminologia PT-BR
