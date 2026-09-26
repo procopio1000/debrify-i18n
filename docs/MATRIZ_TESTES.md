@@ -1,4 +1,4 @@
-# Matriz de testes i18n — V4
+# Matriz de testes i18n — V7
 
 ## Locales
 
@@ -282,3 +282,37 @@ Before promoting pt-BR:
 
 ## Gate O
 - artifact/device/system locale/App language/evidência por cenário real.
+
+
+---
+
+# Matriz V7 — composition/Unicode/outbound sinks
+
+## List composition
+
+- 0/1/2/3+ itens em en e pt-BR;
+- services/trackers de onboarding mantêm brands e localizam somente gramática;
+- failure lists não concatenam frase inglesa + join fixo;
+- middle-dot metadata é classificada como VISUAL_METADATA_LIST;
+- multiline Remote list mantém labels como data e localiza chrome/contagem.
+
+## Grapheme safety
+
+- truncation de folder/profile/external display name não corta `e\u0301`;
+- emoji non-BMP permanece inteiro;
+- família/ZWJ permanece inteira;
+- regional-flag pair permanece inteiro;
+- initials/capitalize não indexam primeiro code unit como “caractere”.
+
+## Casing
+
+- tradução não recebe uppercase/lowercase pós-resolução salvo caso allowlisted;
+- technical badges continuam estáveis;
+- third-party/user labels preservam conteúdo salvo requisito explícito.
+
+## Outbound sinks
+
+- Clipboard de URL/PIN/token é TECHNICAL/USER_DATA e não traduz payload;
+- qualquer copy humana copiada/compartilhada/exportada usa locale efetivo;
+- FilePicker/plugin/system title fornecido pelo app continua coberto como APP_SUPPLIED_SYSTEM_UI;
+- reports legíveis distinguem product copy de diagnostic/external detail.
