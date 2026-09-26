@@ -2363,6 +2363,9 @@ Entregas:
 - inventário de `APP_SUPPLIED_SYSTEM_UI` (PiP, FilePicker/dialogTitle, plugin/system surfaces);
 - inventário de `BUILD_GENERATED_PRODUCT_COPY`, inclusive `.github/workflows/build.yml` -> AppImage `.desktop`;
 - baseline dos test harnesses: MaterialApp/Directionality ad hoc e asserts textuais em inglês.
+- importar `docs/AUDIT_HOTSPOTS_V9.json` como seed verificável, sem tratá-lo como inventário completo;
+- classificar runtime packages alcançáveis em FIRST_PARTY_FORK/VENDORED_THIRD_PARTY/GENERATED;
+- baseline de calendar/date tables, manual date assembly, fixed-hour-cycle e model-level presentation formatting.
 
 Aceite:
 
@@ -2394,6 +2397,9 @@ Entregas:
 - `AppLocalizations.localizationsDelegates`/delegates Material+Widgets+Cupertino em todos os roots;
 - `LocalizedCopyResolver` (ou equivalente) para copy fora de BuildContext sem criar segunda autoridade;
 - `localizedTestApp`/harness comum para testes que renderizam UI localizada.
+- `LocaleFallbackPolicy` versionada e separada de ShippingLocales;
+- `localeEpoch`/LocaleSnapshot para impedir async presentation commit stale;
+- source guard inicial contra segunda autoridade Android per-app language.
 
 Durante esta fase o seletor PT-BR ainda pode ficar oculto.
 
@@ -2426,6 +2432,8 @@ Aceite especial:
 - busca funciona em PT-BR sem acento;
 - mudança de locale reconstrói índice;
 - D-pad/focus permanece determinístico.
+- locale flip preserva query e input/form state;
+- completion assíncrona de Settings Search/support config do locale anterior não pode sobrescrever o locale atual.
 
 ## Fase 3 — Home, Discover, Search, Details, See All e Collections
 
@@ -2511,6 +2519,7 @@ Aceite TV:
 - nenhuma string longa quebra safe area;
 - foco não muda de destino por tradução;
 - open overlay mantém navegação correta.
+- locale flip não reinicia playback, não troca source e não perde posição/session; qualquer recreation nativa futura precisa de handoff explícito.
 
 ## Fase 7 — Android Native Players
 
@@ -2571,6 +2580,9 @@ Cobrir:
 - scrobble states;
 - list management;
 - calendar.
+- remover weekdays/months/Today/Tomorrow/Yesterday manuais dos paths shipping;
+- mover formatter de apresentação para a borda quando hoje estiver em model/service;
+- preservar `TraktCalendarService` Monday-aligned chunking como PROVIDER_CALENDAR_RULE, separado do primeiro dia visual da semana.
 
 Marcas permanecem marcas.
 
@@ -2639,6 +2651,11 @@ Executar auditoria transversal de:
 - hardcoded TextDirection/Alignment/EdgeInsets/Positioned com classificação;
 - RichText/TextSpan/TextPainter/custom painter copy;
 - grammar/reordering de inline placeholders.
+- taxonomia temporal HUMAN_DATE/CIVIL_TIME/FIXED_CLOCK/TIMECODE/PROTOCOL/FILENAME/DIAGNOSTIC/PROVIDER_RULE;
+- Unicode search conformance NFC/NFD/combining marks;
+- collation real vs search-fold;
+- mixed-language Semantics scoped por ownership;
+- locale-switch state continuity.
 
 ## Fase 13 — Zero-regression cleanup
 
@@ -2650,6 +2667,9 @@ Fechar antes da promoção PT-BR os hardenings V6:
 - substituir raw human error messages em boundaries por reason codes;
 - migrar Remote cross-device para result/reason codes com compatibilidade legada;
 - executar a matriz de runtime real definida pelo Gate O;
+- executar completions assíncronas fora de ordem contra `localeEpoch`;
+- executar locale flip en → pt-BR → en com navigation/player/download/recording/pairing/form state vivos;
+- executar scanner recursivo nos runtime roots de `packages/**`;
 
 Objetivo:
 
@@ -3328,7 +3348,7 @@ Glossário inicial continua em docs/GLOSSARIO_PT_BR.md.
 Decisões editoriais devem ser documentadas, por exemplo:
 
 - Addons: manter Addons enquanto a comunidade/produto usar o termo;
-- Player: decidir de forma global entre Player e Reprodutor, não alternar;
+- Player: **Reprodutor** na copy PT-BR do produto; `player` permanece token/nome técnico em código, protocolo e diagnóstico;
 - Sources: Fontes no contexto de playback/search;
 - Settings: Configurações;
 - Home: Início;
@@ -3347,14 +3367,14 @@ Evitar um PR monolítico.
 
 Sequência recomendada:
 
-1. PR A — dependency preflight (intl 0.20.2) + foundation + tests + ShippingLocales en-only + inventory contracts + runtime/remote copy ownership + rich-text/directionality guardrails.
+1. PR A — dependency preflight (intl 0.20.2) + foundation + tests + ShippingLocales en-only + LocaleFallbackPolicy + localeEpoch + inventory contracts + runtime/remote copy ownership + rich-text/directionality guardrails.
 2. PR B — SettingsRows/Settings Search + navigation/profiles/onboarding + SupportRemoteConfig fixed-copy split + language autonyms.
 3. PR C — discover/search/details/collections.
 4. PR D — addons/sources/filters/debrid/downloads + official engine-catalog localization + plugin download notifications.
 5. PR E — Flutter player + TV surfaces.
 6. PR F — Android native resources + NativeLocaleBridge + NativeLocaleStore + background notifications.
 7. PR G — IPTV/Debrify TV/Stremio TV/tracking/sync/recovery.
-8. PR H — Apple/Desktop/Web native surfaces + macOS menu + Windows installer/metadata + Web lang/dir + formatting/a11y hardening.
+8. PR H — Apple/Desktop/Web native surfaces + macOS menu + Windows installer/metadata + Web lang/dir + temporal taxonomy + Unicode search/collation + mixed-language a11y hardening.
 9. PR I — PT-BR completion, full audit, promotion to ShippingLocales.
 
 Cada PR deve:
