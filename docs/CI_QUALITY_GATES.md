@@ -1,6 +1,6 @@
-# Quality Gates i18n — V9
+# Quality Gates i18n — V10
 
-Este documento é normativo e usa exatamente os mesmos IDs de `PLANO_MESTRE_V9.md`.
+Este documento é normativo e usa exatamente os mesmos IDs de `PLANO_MESTRE_V10.md`.
 
 **Registro canônico:** `0, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q`.
 
@@ -107,7 +107,9 @@ Cobrir:
 - language display maps;
 - TV keyboard submit/action labels;
 - raw exception/provider/remote messages que alcançam UI;
-- Clipboard/share/export/report/plugin/system human-text sinks.
+- Clipboard/share/export/report/plugin/system human-text sinks;
+- enum/model/extension/registry option copy que alcança UI indiretamente;
+- app-owned `label/title/subtitle/description/displayName/statusText/*Text/formatted*` fora do sink direto.
 
 Toda exclusão deve registrar ownership, reachability e motivo.
 
@@ -135,7 +137,9 @@ Testar en e pt-BR:
 - plural;
 - natural-language list formatting;
 - parsing de número humano;
-- round-trip input localizado → valor canônico → output localizado.
+- round-trip input localizado → valor canônico → output localizado;
+- civil-time patterns (`hour % 12`, manual `AM/PM`, `hour/minute.padLeft`) em presentation paths;
+- compact numbers/metrics sem `toStringAsFixed + K/M/B/views` como formatter final.
 
 Separar explicitamente campos humanos de IP/URL/porta/PIN/ID/hash/schema tokens.
 
@@ -313,7 +317,9 @@ Falhar se:
 - novo target/path/asset/workflow não foi classificado;
 - allowlist pertence a outra baseline;
 - Flutter/dependency/plugin/backend relevante mudou sem revalidação;
-- qualquer documento normativo usa IDs diferentes de `0,A..Q`.
+- qualquer documento normativo usa IDs diferentes de `0,A..Q`;
+- `RuntimeSurfaceUniverse` não fecha exatamente em `ClassifiedReachable ∪ ExcludedWithEvidence`;
+- existe path runtime relevante sem classificação ou exclusão com evidência.
 
 ## Release promotion contract
 
@@ -373,3 +379,37 @@ Falhar ou exigir classificação quando houver:
 - novo/alterado runtime root sob `packages/**` exige classificação/scan;
 - mudança em calendar/formatter/platform-locale APIs exige reclassificação pela taxonomia V9;
 - documentos normativos devem apontar `PLANO_MESTRE_V9.md` e manter o registro `0,A..Q`.
+
+
+---
+
+# Hardening normativo V10 por gate
+
+Os IDs continuam `0, A..Q`; não existe Gate R.
+
+### Reforço V10 — Gate D — indirect presentation dataflow
+
+Reportar strings PRODUCT_COPY originadas em enum constructors, extension/model/service getters, records, registries e static option tables quando alcançam UI/accessibility/system human-text sinks. Heurísticas de nomes como `label`, `description`, `displayName`, `statusText`, `*Text` e `formatted*` produzem findings para classificação; brand/external/user data não é traduzido automaticamente.
+
+### Reforço V10 — Gate E — option identity
+
+Falhar quando localized/display label vira storage value, branch identity, cache identity ou source of truth de Settings Search. Stable id/storage key permanece canônico e todos os consumidores de copy usam o mesmo localized mapper.
+
+### Reforço V10 — Gate F — temporal/compact formatting
+
+Reportar/classificar `hour % 12`, `hour >= 12` com AM/PM literal, relógio civil montado por padLeft e compact numbers manuais com `toStringAsFixed`/K/M/B/substantivo inglês quando o resultado alcança UI.
+
+### Reforço V10 — Gate P — indirect Unicode/composition
+
+Composition/casing/list checks seguem a origem da copy mesmo quando ela é carregada por registry/model antes de chegar ao widget.
+
+### Reforço V10 — Gate Q — exact coverage closure
+
+A tree auditada precisa satisfazer:
+
+```text
+RuntimeSurfaceUniverse == ClassifiedReachable ∪ ExcludedWithEvidence
+ClassifiedReachable ∩ ExcludedWithEvidence == ∅
+```
+
+Path novo, blob alterado sensível, generated sem generator ou vendored patch sem ownership revalidado bloqueia o gate.
