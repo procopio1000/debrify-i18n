@@ -140,6 +140,19 @@ A sexta auditoria partiu da V5 e procurou classes de falha que ainda poderiam pr
 6. **Artifact inspection não substitui runtime real para superfícies OS/hardware-owned.** PiP, notification channels, FilePicker, permission prompts, Top Shelf, TV input/focus e screen readers precisam de smoke de runtime em target representativo. A V6 adiciona Gate O.
 7. **Catálogo de tradução também precisa de higiene de ciclo de vida.** Além de key parity, CI deve detectar keys ARB órfãs/não alcançadas e exceções obsoletas para que a migração não acumule copy morta ou traduções que parecem cobertura sem qualquer sink real.
 
+
+## 0.8 Novos achados bloqueadores da auditoria V7
+
+A V7 revalida a mesma baseline exata da V6 e acrescenta classes de falha que não são capturadas por um scanner focado apenas em literais traduzíveis:
+
+1. **Composição manual de listas user-facing.** Há caminhos reais que usam `.join(', ')`, `.join(' · ')` e `.join('\n')` para formar apresentação. Nem todo `join` precisa ser localizado, mas todo `join` que alcança UI precisa ser classificado como lista natural localizada, metadata visual estruturada, bloco multiline ou dado técnico.
+2. **Truncamento e transformação por code unit.** A baseline contém `String.length` + `substring` em nomes exibidos e capitalização por `s[0]`. Isso pode cortar surrogate pairs, ZWJ emoji e combining marks. UI deve operar por grapheme cluster quando a intenção é “caractere percebido pelo usuário”.
+3. **Casing localizado/grapheme-safe.** `toUpperCase/toLowerCase` continuam permitidos para tokens técnicos; para copy/dados visíveis devem ser evitados ou aplicados por uma política explícita que não quebre graphemes nem assuma regras inglesas.
+4. **Sinks de texto fora da árvore de widgets.** Clipboard, conteúdo gerado para share/export/report e nomes/títulos sugeridos por dialogs/plugins podem ser user-facing mesmo sem passar por `Text(...)`. O inventário passa a classificá-los explicitamente.
+5. **Coerência documental.** Arquitetura, quality gates e matriz de testes deixam de carregar cabeçalhos históricos “V4 + apêndices” e passam a identificar a versão canônica V7, reduzindo ambiguidade para implementação automatizada.
+
+Evidências detalhadas ficam em `docs/AUDITORIA_V7.md`.
+
 # 1. Objetivo e definição de sucesso
 
 O projeto não é uma tradução PT-BR pontual. O objetivo é criar uma infraestrutura permanente de internacionalização e localização que permita adicionar idiomas sem reescrever arquitetura, sem misturar idioma de UI com idioma de conteúdo e sem introduzir regressões em TV, player, perfis, sync ou protocolos.
@@ -1416,6 +1429,81 @@ Regras:
 - testes cobrem colagem, teclado físico, IME e teclado TV quando a mesma entrada é alcançável.
 
 Gate F deve detectar `double.parse/tryParse`, `num.parse` e regex decimal em input user-facing que contorne essa política.
+
+
+## 6.9 Composição de listas e summaries
+
+Não tratar toda ocorrência de `.join(...)` como bug. Classificar cada composição user-facing:
+
+- **NATURAL_LANGUAGE_LIST** — nomes/itens que formam uma lista lida como frase; resolver com um `LocalizedListFormatter`/mensagem ICU que permita conjunção e padrão por locale;
+- **VISUAL_METADATA_LIST** — blocos compactos como `ano · duração · gênero`; o separador pode ser design-invariant, mas cada item e sua ordem precisam de ownership/teste explícitos;
+- **MULTILINE_STRUCTURED_LIST** — uma linha por item em dialog/report; newline pode ser invariant, porém cabeçalho, contagem e reason copy são localizados;
+- **TECHNICAL_LIST** — IDs, codecs, URLs, tokens; não localizar automaticamente.
+
+Casos baseline que entram no inventário:
+
+- `onboarding/steps/done_step.dart`: services/trackers com `join(', ')`;
+- `rewatch_progress_dialog.dart`: lista de falhas com `join(', ')` dentro de frase;
+- `continue_watching_presentation.dart`, cards e metadata: joins com middle dot;
+- Remote: labels falhos unidos por newline.
+
+Regras:
+
+- zero lista natural user-facing montada por separador inglês fixo sem classificação;
+- para 0/1/2/3+ itens, testar output en/pt-BR;
+- não traduzir os elementos quando forem brand/user/third-party data; localizar somente a gramática ao redor;
+- não persistir o resultado já formatado quando a lista semântica puder ser persistida.
+
+## 6.10 Grapheme-safe text handling
+
+Sempre que a intenção for contar, truncar, pegar inicial, apagar ou limitar “caracteres” percebidos pelo usuário, operar por grapheme clusters, não por UTF-16 code units.
+
+Inventariar caminhos user-facing com:
+
+- `String.length` usado como limite visual;
+- `substring`/índice `s[0]` para truncar/capitalizar nomes;
+- helpers `truncate/capitalize/initials`;
+- contadores/limites de input próprios;
+- transformações que possam cortar combining marks, surrogate pairs ou sequências ZWJ.
+
+Casos baseline confirmados:
+
+- `pikpak_folder_picker_dialog.dart::_truncateFolderName` usa `name.length` + `substring`;
+- `addon_hub_screen.dart::_capitalize` usa `s[0]` + `substring(1)`;
+- `main.dart::_describeStartupFailure` trunca detalhe por code unit e deve ser classificado como diagnostic/external detail e tornado grapheme-safe se exibido;
+- `addon_identity.dart` já usa `.characters.first`, mas o casing final ainda requer classificação.
+
+Testar no mínimo:
+
+- `Configuração`;
+- forma decomposta `e\u0301`;
+- emoji fora do BMP;
+- emoji ZWJ/família;
+- flag regional;
+- string mista RTL/LTR quando relevante.
+
+## 6.11 Casing e capitalização
+
+Para `toUpperCase/toLowerCase` em presentation paths:
+
+- tokens técnicos/design tokens podem manter transformação invariável se documentado;
+- copy localizada deve preferir a forma fornecida pela tradução, sem transformação pós-l10n;
+- dados externos/user data não devem ser “corrigidos” para uma convenção inglesa;
+- helpers de capitalização devem ser grapheme-safe e não assumir que o primeiro code unit é uma letra inteira;
+- se um locale futuro exigir case mapping especial, a política deve ser explícita e testável, sem espalhar transforms ad hoc.
+
+## 6.12 Outbound human-text sinks
+
+O scanner/inventário também considera texto humano produzido para fora de widgets:
+
+- `ClipboardData(text: ...)` quando o conteúdo é copy do produto, não apenas URL/token/user data;
+- templates de compartilhamento quando existirem;
+- texto de export/report criado para leitura humana;
+- nomes/títulos sugeridos a FilePicker/chooser/plugins;
+- content descriptions/titles enviados a APIs de sistema;
+- bodies de notificação e outras superfícies já classificadas.
+
+Cada ocorrência recebe ownership: PRODUCT_COPY, USER_DATA, THIRD_PARTY_DATA, BRAND/TECHNICAL ou DIAGNOSTIC_DETAIL. Um sink invisível ao widget tree não pode ser automaticamente excluído da auditoria.
 
 # 7. RTL, layout, fontes, acessibilidade e input
 
