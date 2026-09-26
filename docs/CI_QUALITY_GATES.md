@@ -378,7 +378,7 @@ Falhar ou exigir classificação quando houver:
 
 - novo/alterado runtime root sob `packages/**` exige classificação/scan;
 - mudança em calendar/formatter/platform-locale APIs exige reclassificação pela taxonomia V9;
-- documentos normativos devem apontar `PLANO_MESTRE_V9.md` e manter o registro `0,A..Q`.
+- documentos normativos devem apontar `PLANO_MESTRE_V10.md` e manter o registro `0,A..Q`.
 
 
 ---
