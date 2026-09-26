@@ -2687,7 +2687,7 @@ Somente agora:
 
 ## 11.0 Registro canônico de gates
 
-Os IDs abaixo são API documental estável. `PLANO_MESTRE_V8.md`, `docs/CI_QUALITY_GATES.md`, matriz de testes, PR templates e scripts devem usar **os mesmos IDs**; aliases numéricos ou históricos são proibidos.
+Os IDs abaixo são API documental estável. `PLANO_MESTRE_V9.md`, `docs/CI_QUALITY_GATES.md`, matriz de testes, PR templates e scripts devem usar **os mesmos IDs**; aliases numéricos ou históricos são proibidos.
 
 | ID | Contrato |
 |---|---|
