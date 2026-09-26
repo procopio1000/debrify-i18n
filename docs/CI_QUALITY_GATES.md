@@ -1,11 +1,20 @@
-# Quality Gates i18n — V7
+# Quality Gates i18n — V8
 
-## Gate 0 — dependency compatibility
+Este documento é normativo e usa exatamente os mesmos IDs de `PLANO_MESTRE_V8.md`.
 
-Baseline:
+**Registro canônico:** `0, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q`.
+
+É proibido manter aliases como “Gate 1”, “Gate 12 / Gate L” ou renumerar gates em scripts/documentação.
+
+## Gate 0 — dependency/toolchain preflight
+
+Baseline auditada:
 
     Flutter 3.44.8
-    flutter_localizations -> intl 0.20.2
+    intl resolvido antes da fundação i18n = 0.19.0
+    flutter_localizations alvo -> intl 0.20.2
+    shared_preferences = 2.5.3
+    shared_preferences_android = 2.4.10
 
 Run:
 
@@ -16,240 +25,296 @@ Run:
 
 Fail if:
 
-- intl does not resolve 0.20.2 under the pinned baseline;
-- dependency_overrides masks intl;
-- l10n.yaml contains synthetic-package;
-- gen-l10n emits an unexpected warning;
-- lockfile drift is unexplained.
+- Flutter diverge da versão de baseline sem reauditoria;
+- `intl` não resolve 0.20.2 depois de adicionar `flutter_localizations`;
+- `dependency_overrides` mascara conflito;
+- `l10n.yaml` contém `synthetic-package`;
+- gen-l10n emite warning inesperado;
+- lockfile drift não é explicado;
+- `shared_preferences`/backend muda sem revalidar NativeLocaleStore;
+- manifest do baseline não corresponde à base upstream pretendida.
 
-## Gate 1 — pinned toolchain
+## Gate A — geração/toolchain
 
-Use the same Flutter version as upstream CI.
+Usar a mesma versão de Flutter do upstream.
 
     flutter pub get
     flutter gen-l10n
 
-Generation must be reproducible. When generated localization source is committed, run `git diff --exit-code -- lib/l10n/generated` after generation.
+A geração deve ser reproduzível. Se generated localization source for versionado:
 
-## Gate 2 — ARB schema and parity
+    git diff --exit-code -- lib/l10n/generated
 
-Validate:
+Falhar se imports/build dependem de generated code que não foi produzido ou se a política de versionamento diverge do plano.
 
-- valid JSON;
+## Gate B — ARB schema, parity e lifecycle
+
+Validar:
+
+- JSON válido;
 - template key parity;
-- @metadata required;
-- placeholder name/type parity;
-- ICU syntax;
-- plural/select validity;
+- `@metadata` obrigatório;
+- placeholder names/types;
+- ICU;
+- plural/select;
 - escaping;
-- zero untranslated messages for shipping locales.
+- duplicate semantic keys;
+- zero untranslated messages em shipping locale;
+- zero key ARB órfã/não alcançada salvo allowlist justificada;
+- zero allowlist stale;
+- descrição semântica para novas keys;
+- nenhuma key depende de texto de display como identidade.
 
-## Gate 3 — ShippingLocales
+## Gate C — ShippingLocales
 
-Validate:
+Validar:
 
-- every shipping locale exists in generated locales;
-- selector exposes only shipping locales;
-- locale resolver accepts only shipping overrides;
-- development/pseudo locales never ship accidentally.
+- shipping locales ⊆ generated locales;
+- seletor expõe somente shipping;
+- `en` permanece disponível;
+- pseudo/debug locales nunca shipam;
+- override persistido aceita somente `ProductLocaleId` shipping válido;
+- `system` é sentinel separado;
+- pt-BR só entra após promoção formal.
 
-## Gate 4 — hardcoded user-facing text
+## Gate D — hardcoded/reachability/product text
 
-    dart run tool/l10n_audit.dart
+Preferir scanner AST/token-aware em Dart e parsers adequados nas plataformas, complementados por regex.
 
-Scan beyond Text(...):
+Cobrir:
 
-- titles/labels/subtitles;
-- helper return strings;
-- status/error functions;
-- SnackBar/Dialog;
-- tooltip/hint;
-- Semantics;
-- native setText/contentDescription/Toast/dialogs;
-- Android XML android:text/contentDescription/hint;
-- NotificationCompat title/text/action/channel;
-- Services/Receivers that can run without Flutter;
-- macOS native menu copy;
-- Windows installer copy;
-- plist permission descriptions;
-- web shell metadata and DOM lang/dir;
+- `Text`, labels, titles, subtitles, hints;
+- helper return strings e status/error functions;
+- SnackBar/Dialog/tooltip/Semantics;
 - Text.rich/RichText/TextSpan/InlineSpan;
-- TextPainter/CustomPainter/Canvas text;
-- TaskNotification/background_downloader copy;
-- runtime-loaded JSON/YAML/CSV/Markdown que alimenta UI;
-- remote product copy e fallback assets;
-- MarkdownBody/Markdown sources;
-- official setup/help links and QR destinations;
-- SVG text and runtime visual assets with potential embedded copy.
+- TextPainter/CustomPainter/Canvas;
+- native setText/contentDescription/Toast/dialogs;
+- Android XML string-bearing, menus, arrays, plurals e accessibility attrs;
+- NotificationCompat, TaskNotification/background_downloader;
+- Services/Receivers headless;
+- PiP RemoteAction;
+- FilePicker/plugin dialog titles;
+- plist permission descriptions;
+- macOS menu;
+- Windows installer/registry descriptions;
+- Linux `.desktop` e copy gerada em workflow;
+- web shell/manifest/DOM;
+- runtime JSON/YAML/CSV/Markdown;
+- remote product copy/fallback assets;
+- official help/setup/release content;
+- links/QR oficiais acionados pelo app;
+- SVG e runtime visual assets com texto;
+- language display maps;
+- TV keyboard submit/action labels;
+- raw exception/provider/remote messages que alcançam UI;
+- Clipboard/share/export/report/plugin/system human-text sinks.
 
-All exceptions require a versioned reason.
+Toda exclusão deve registrar ownership, reachability e motivo.
 
-## Gate 5 — semantic coupling
+## Gate E — semantic coupling e presentation-cache identity
 
-    dart run tool/l10n_semantic_coupling_audit.dart
+Falhar em novos casos de:
 
-Fail on new patterns where display/localized text is used as:
+- branch/switch por display/localized text;
+- persistência de localized string quando existe estado semântico;
+- id/route/cache/database key derivados de label;
+- protocolo cross-device usando mensagem humana como status/identity;
+- UI escolhendo comportamento por exception message;
+- cache singleton/static de copy localizada que pode sobreviver à troca de idioma sem `ProductLocaleId`/invalidation;
+- output já localizado tratado como dado canônico.
 
-- branch condition;
-- switch discriminator;
-- persisted value;
-- route/id;
-- cache/database key.
+## Gate F — formatters e localized human input
 
-## Gate 6 — platform resources
+Testar en e pt-BR:
 
-Compare Android default and pt-BR resource keys.
+- date/time + timezone;
+- 12h/24h quando a plataforma expõe preferência;
+- number/percentage/rating/statistics;
+- file size sem mudar silenciosamente a base 1024/1000;
+- duration/relative time;
+- plural;
+- natural-language list formatting;
+- parsing de número humano;
+- round-trip input localizado → valor canônico → output localizado.
 
-Audit Apple InfoPlist.strings/project localizations.
+Separar explicitamente campos humanos de IP/URL/porta/PIN/ID/hash/schema tokens.
 
-Audit tvOS Top Shelf resources.
+Rejeitar input ambíguo em vez de aplicar replace global de `,`/`.`.
 
-Audit Web manifest/index and runtime lang/dir.
-
-Audit Windows installer language/custom messages and Runner.rc metadata.
-
-Audit macOS MainMenu localization.
-
-Audit NativeLocaleStore/background notification resources.
-
-Validate locale storage architecture:
-
-- ui_locale_v1 is registered in DevicePreferences.allowedKeys;
-- ProfilePreferencePortability rejects ui_locale_v1;
-- no ui_locale_native_mirror_* key exists;
-- no new raw SharedPreferences access is introduced by i18n;
-- Android backup rules continue excluding SharedPreferences unless a deliberate policy change is reviewed.
-
-## Gate 7 — formatters
-
-Test en and pt_BR for:
-
-- date;
-- time;
-- number;
-- decimal file size;
-- percentage;
-- duration;
-- relative time.
-
-## Gate 8 — analysis
+## Gate G — Flutter analysis/test
 
     flutter analyze
+    flutter test
 
-## Gate 9 — tests
+Durante migração, suites segmentadas são permitidas. Antes da promoção, a suite suportada completa deve estar verde ou qualquer falha preexistente precisa de baseline reproduzível.
 
-Run targeted l10n tests during each phase.
+O harness comum deve fornecer delegates + ShippingLocales + locale explícito. Testes não destinados a wording não devem depender desnecessariamente de literal inglês.
 
-Before PT-BR promotion run the full supported upstream suite or document a reproducible pre-existing baseline for unrelated failures.
+## Gate H — Android native
 
-## Gate 10 — Android native tests
+Executar Gradle/Robolectric/device tests pertinentes.
 
-Run relevant Gradle/Robolectric tests for:
+Validar:
 
-- AndroidTvTorrentPlayerActivity;
-- TorboxTvPlayerActivity;
-- NativeLocaleBridge;
-- NativeLocaleStore single-store contract;
-- DevicePreferences/ProfilePreferencePortability contract;
-- resource resolution;
-- process-dead Service/Receiver notification;
-- existing notification channel after locale change;
-- notification actions/plurals;
-- zero branch based on localized/display text.
+- parity `values` ↔ `values-pt-rBR` por nome e tipo;
+- placeholders/formats/plurals/arrays;
+- `AndroidTvTorrentPlayerActivity`;
+- `TorboxTvPlayerActivity`;
+- `MainActivity` PiP;
+- `NativeLocaleBridge`;
+- `NativeLocaleStore`;
+- contract baseline `FlutterSharedPreferences / flutter.ui_locale_v1`;
+- Dart write → native cold-read;
+- corrupt/missing locale → fallback seguro;
+- DevicePreferences/ProfilePreferencePortability;
+- process-dead Services/Receivers;
+- notification channels/actions;
+- zero branch por display text.
 
-## Gate 11 — layout/a11y
+## Gate I — platform build matrix
 
-Test:
+Compilar os targets publicados pelo upstream:
 
-- pseudo-LTR expansion;
+- Android;
+- iOS;
+- tvOS;
+- macOS;
+- Windows;
+- Linux x64;
+- Linux arm64.
+
+Web deve compilar quando a superfície fizer parte do suporte esperado.
+
+Mudança de matrix/workflow exige reclassificação no Gate Q.
+
+## Gate J — pseudo/layout
+
+Executar widget/golden/manual conforme superfície:
+
+- pseudo-LTR expandido;
 - pseudo-RTL;
 - text scale;
 - narrow phone;
-- desktop;
+- tablet/desktop;
 - TV D-pad/focus;
-- Semantics/contentDescription.
+- dialogs/bottom sheets/overlays/player;
+- glyph/font coverage.
 
-## Gate 12 / Gate L — remote/runtime product copy
+Não “corrigir” overflow reduzindo fonte agressivamente como regra geral.
 
-Fail or block promotion when:
+## Gate K — secrets/log privacy
 
-- product-owned remote field is user-facing but has no locale policy;
-- shipping locale falls back to English for official campaign/support copy;
-- official engine-catalog editorial copy has no pt-BR path;
-- cached remote copy can retain the previous locale variant;
-- a runtime asset reaches UI without inventory/classification;
-- official Markdown/release content has no ownership/locale policy;
-- an essential official setup/help destination has no documented locale policy;
-- fixed Settings copy still comes from English remote config instead of ARB.
+Mudanças de erro/localização não podem expor:
 
-Completeness report must expose ARB, native resources, remote product copy, product-controlled remote catalog and runtime asset copy separately.
+- tokens;
+- credentials;
+- signed URLs;
+- payloads privados;
+- filesystem paths sensíveis;
+- secret-bearing exception detail.
 
-## Gate 13 / Gate M — directionality and inline-text safety
+UI localizada usa reason codes + argumentos seguros; diagnóstico bruto permanece em canal apropriado.
 
-Report app-owned runtime occurrences of:
+## Gate L — remote/runtime/official product copy
 
-- hardcoded TextDirection.ltr/rtl;
-- Alignment left/right;
-- semantic EdgeInsets/Positioned using physical left/right;
-- directional icons;
-- TextSpan fragment ordering that assumes English grammar.
+Bloquear quando:
 
-Every finding must be fixed or allowlisted with physical/brand/third-party justification. Pseudo-RTL must cover rich text and mixed-direction data.
+- product-owned remote field não possui locale policy;
+- shipping pt-BR cai para inglês em campanha/suporte oficial;
+- catálogo remoto oficial não possui caminho pt-BR;
+- cached remote copy pode servir locale anterior;
+- runtime asset alcança UI sem inventory;
+- release notes/Markdown oficial não têm ownership/policy;
+- setup/help oficial essencial não tem locale policy;
+- link oficial externo assume que browser `Accept-Language` == App language;
+- QR em outro dispositivo é tratado como se herdasse o locale do app de origem.
 
-## Gate 14 — release
+Completeness report separa ARB, native resources, remote product copy, product-controlled catalog, runtime assets e official product content.
 
-Do not add PT-BR to ShippingLocales until:
+## Gate M — directionality e inline-text safety
 
-- ARB completeness = 100%;
-- native resources = 100%;
-- semantic coupling findings = 0;
-- unapproved hardcoded UI findings = 0;
-- platform and critical runtime tests pass;
-- Windows installer pt-BR passes;
-- macOS menu pt-BR passes;
-- Web lang/dir passes;
-- background Android locale after process death passes;
-- stale allowlist entries = 0;
-- remote product copy completeness = 100% for shipping pt-BR;
-- runtime asset findings unclassified = 0;
-- hardcoded directionality findings unclassified = 0;
-- rich-text/custom-painter findings unclassified = 0.
+Reportar app-owned runtime:
 
+- `TextDirection.ltr/rtl` hardcoded;
+- Alignment Left/Right;
+- EdgeInsets/Positioned físicos quando start/end é semântico;
+- directional icons/arrows;
+- ordem rígida de spans para frase;
+- dados LTR interpolados sem isolamento em contexto RTL.
 
----
+Todo finding é corrigido ou allowlisted como físico/brand/technical com justificativa.
 
-# Adições V6
+## Gate N — packaged artifact localization
 
-## Extensões dos gates existentes
+Inspecionar artefato final, não apenas source:
 
-**Gate B:** detectar keys ARB órfãs/não alcançadas e allowlist stale.  
-**Gate D:** incluir language display maps, TvTextField/TvKeyboard action labels e raw error/remote messages em sinks de UI.  
-**Gate E:** proibir display text/localized text como result identity em protocolo cross-device e branches por exception message.  
-**Gate F:** testar parsing de input humano pt-BR/en e separar tokens técnicos invariantes.
+- APK: `values-pt-rBR`, plurals e resources após shrink/minify;
+- IPA/tvOS: `pt-BR.lproj`, InfoPlist.strings, target membership, TopShelf;
+- macOS app/DMG: lproj + MainMenu;
+- Windows installer: BrazilianPortuguese + CustomMessages/tasks/run;
+- Linux AppImage x64/arm64: `Comment[pt_BR]` e source canônica;
+- Web build: shell/manifest policy quando suportado.
 
-## Gate O — Real-device runtime localization smoke
+Falhar se workflow/script sobrescreve uma fonte localizada por copy English-only.
 
-Antes de promover pt-BR:
+## Gate O — real-device runtime localization smoke
 
-- Android phone/tablet: system en ↔ app pt-BR e system pt-BR ↔ app en;
-- Android TV hardware: native players, D-pad/focus, keyboard, notifications/channels, PiP quando suportado;
-- tvOS hardware: focus/input/Top Shelf e boundary de system/app language;
+Antes da promoção:
+
+- Android phone/tablet: system en + app pt-BR e inverso;
+- Android TV hardware: native players, D-pad/focus, TV keyboard, notifications/channels, PiP;
+- tvOS hardware: focus/input/TopShelf;
 - native shell smoke nas demais plataformas publicadas;
-- accessibility/screen reader em ao menos um cenário system locale diferente do App language.
+- screen reader em ao menos um cenário system locale != App language;
+- Semantics tree do Flutter expõe o locale do App language onde a copy é app-owned.
 
-Toda evidência registra artifact SHA/build, device/OS, system locale, App language e resultado.
+Registrar artifact SHA/build, device/OS, system locale, App language e evidência.
 
+## Gate P — Unicode, composition e outbound text sinks
 
----
+Falhar/allowlistar quando houver:
 
-# Gate P — Unicode, composition e outbound text sinks
-
-Falhar ou exigir allowlist versionada quando um path user-facing possuir:
-
-- lista natural criada por `.join(', ')`/separador fixo sem formatter/ICU/classificação;
-- helper visual de truncate/capitalize/initials baseado em `String.length`, `substring`, `s[0]` ou code unit;
+- natural-language `.join` com separador fixo;
+- truncate/capitalize/initials por UTF-16 code unit;
 - casing pós-localização não classificado;
 - Clipboard/share/export/report/plugin/system human-text sink sem ownership;
-- localized string persistida como resultado de composição quando dados semânticos poderiam ser persistidos.
+- resultado localizado/composicionado persistido em vez de estado semântico;
+- presentation cache não locale-keyed/invalidation-safe.
 
-Exigir testes para 0/1/2/3+ listas e para combining mark, non-BMP, ZWJ emoji e regional flag nos helpers grapheme-sensitive.
+Testes obrigatórios:
+
+- listas 0/1/2/3+;
+- combining marks;
+- non-BMP;
+- ZWJ emoji;
+- regional flag;
+- en → pt-BR → en sem restart.
+
+## Gate Q — upstream baseline drift e audit freshness
+
+Fonte de verdade:
+
+    docs/AUDIT_BASELINE_MANIFEST.json
+
+Antes da implementação, rebases relevantes e promoção:
+
+1. resolver a base upstream pretendida;
+2. comparar com `auditedCommit`;
+3. se mudou, obter diff completo;
+4. classificar paths por reachability/ownership;
+5. rerodar D–P no delta;
+6. fazer full scan na promoção;
+7. atualizar manifest somente após revisão;
+8. validar tree SHA/contagens quando aplicável.
+
+Falhar se:
+
+- SHA mudou sem audit delta;
+- novo target/path/asset/workflow não foi classificado;
+- allowlist pertence a outra baseline;
+- Flutter/dependency/plugin/backend relevante mudou sem revalidação;
+- qualquer documento normativo usa IDs diferentes de `0,A..Q`.
+
+## Release promotion contract
+
+PT-BR só entra em `ShippingLocales` quando **0 + A..Q** aplicáveis estiverem verdes e a evidência mínima do plano estiver anexada. Não existe equivalência implícita entre IDs, e “não aplicável” precisa de justificativa versionada.

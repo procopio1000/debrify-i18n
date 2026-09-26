@@ -4,114 +4,110 @@ Projeto de planejamento e especificação para implementar internacionalização
 
 ## Estado atual
 
-**Plano canônico:** PLANO_MESTRE_V7.md
+**Plano canônico:** `PLANO_MESTRE_V8.md`
 
-A V7 foi re-auditada contra a mesma baseline exata do upstream em 2026-09-25 e preserva todos os hardenings da V6. Ela fecha também composição de listas user-facing, truncamento/capitalização Unicode por grapheme cluster, casing pós-localização e sinks de texto humano fora da árvore de widgets (clipboard/share/export/report/plugin). O Gate P torna essas classes verificáveis em CI.
+A V8 foi re-auditada contra a árvore exata do upstream em 2026-09-25. Ela preserva todos os hardenings V1–V7 e fecha as últimas ambiguidades executáveis encontradas entre plano, CI e runtime nativo.
 
-V1–V6 permanecem no repositório como histórico/audit trail.
+Principais reforços V8:
+
+- Gate P passa a existir também no plano canônico, não apenas nos documentos auxiliares;
+- um único registro de gates: `0, A..Q`;
+- Gate Q bloqueia drift não auditado do upstream;
+- `docs/AUDIT_BASELINE_MANIFEST.json` fixa baseline de forma machine-readable;
+- `ProductLocaleId = language[-Script][-REGION]` evita prometer round-trip de BCP-47 que o `Locale` do produto não preserva;
+- contrato Android baseline exato: `FlutterSharedPreferences / flutter.ui_locale_v1`;
+- presentation caches precisam ser locale-keyed/invalidation-safe;
+- links/QR oficiais distinguem App language de browser/system/outro dispositivo.
+
+V1–V7 permanecem como histórico/audit trail e não substituem a V8.
 
 ## Alvo verificado
 
-- Upstream: varunsalian/debrify
-- Baseline: v0.10.0-beta.1
-- Commit auditado: 9619c10b06ee919cacbe996b30be7739dc09c6d6
-- Primeiro locale completo: pt-BR
-- Template canônico: en
+- Upstream: `varunsalian/debrify`
+- Baseline: `v0.10.0-beta.1`
+- Commit auditado: `9619c10b06ee919cacbe996b30be7739dc09c6d6`
+- Tree auditada: `cffb6c9d272c662eb0f5f93e6376cb4b239a57c3`
+- Recursive tree: completa (`truncated=false`)
+- Primeiro locale completo: `pt-BR`
+- Template canônico: `en`
 
-## Arquivos
+Contagem estrutural reproduzida na V8:
 
-- PLANO_MESTRE_V7.md — plano canônico atual, toolchain/cross-runtime/cross-device/packaging/runtime-verified-by-design, unicode/composition-hardened e implementation-ready
-- PLANO_MESTRE_V6.md — histórico/superseded pela V7
-- PLANO_MESTRE_V5.md — histórico/superseded pela V6
-- PLANO_MESTRE_V4.md — histórico/superseded pela V5
-- PLANO_MESTRE_V3.md — histórico/superseded pela V4
-- PLANO_MESTRE_V2.md — histórico/superseded pela V3
-- PLANO_MESTRE_V1.md — histórico/superseded
-- docs/AUDITORIA_V7.md — sétima auditoria, composition/Unicode/outbound text sinks e evidências
-- docs/AUDITORIA_V6.md — sexta auditoria, semantic boundaries/cross-device/input/runtime smoke e evidências
-- docs/AUDITORIA_V5.md — histórico da quinta auditoria
-- docs/AUDITORIA_V4.md — histórico da quarta auditoria
-- docs/AUDITORIA_V3.md — histórico da terceira auditoria
-- docs/AUDITORIA_V2.md — histórico da segunda auditoria
-- docs/AUDITORIA_BASELINE.md — evidências da auditoria inicial
-- docs/ARQUITETURA.md — arquitetura V6
-- docs/GLOSSARIO_PT_BR.md — terminologia inicial
-- docs/MATRIZ_TESTES.md — matriz de testes V6
-- docs/CI_QUALITY_GATES.md — quality gates V6
+- 3.199 blobs totais;
+- 1.736 arquivos nos roots first-party de produto;
+- 2.109 ao incluir `packages/`.
 
-## O que a V6 consolida e acrescenta
+Contagem estrutural não significa que todo arquivo contém UI; reachability e ownership continuam obrigatórios.
 
-Além de todos os contratos V1–V5, a V6 acrescenta explicitamente:
+## Arquivos normativos
 
-- nomes de idiomas como apresentação localizada, mantendo ISO/BCP-47 como identidade;
-- parsing locale-aware de entrada numérica humana sem alterar IP/URL/PIN/IDs/protocolos;
-- `keyboardSubmitLabel` e action/semantics do teclado Debrify TV como sinks explícitos;
-- reason/result codes estáveis em boundaries Dart/native/services;
-- Remote multi-device localizando no receptor, não no emissor;
-- Gate O de runtime real para PiP/notifications/FilePicker/Top Shelf/TV/accessibility;
-- detecção de ARB/allowlist órfãos/stale;
+- `PLANO_MESTRE_V8.md` — fonte canônica de implementação
+- `docs/ARQUITETURA.md` — arquitetura V8
+- `docs/CI_QUALITY_GATES.md` — gates V8 com IDs canônicos
+- `docs/MATRIZ_TESTES.md` — matriz V8
+- `docs/AUDIT_BASELINE_MANIFEST.json` — baseline machine-readable
+- `docs/GLOSSARIO_PT_BR.md` — terminologia PT-BR
 
-A V6 também preserva integralmente o hardening acumulado anteriormente:
+## Evidência/audit trail
 
-- ShippingLocales separado dos locales gerados;
-- SettingsRows e Settings Search localizados por identidade estável;
-- proibição de usar display text como lógica/persistência;
-- scanner de strings fora de widgets;
-- ambos os players Android nativos;
-- NativeLocaleBridge;
-- iOS/tvOS/macOS e InfoPlist.strings;
-- tvOS Top Shelf;
-- Windows/Linux;
-- Web/PWA e remoção de placeholders;
-- case transforms;
-- RTL;
-- fontes;
-- acessibilidade;
-- teclado/input TV;
-- rollout, rollback e PR strategy;
-- Definition of Done mensurável.
-- compatibilidade real `flutter_localizations` / `intl 0.20.2` no Flutter 3.44.8;
-- remoção de `synthetic-package` obsoleto;
-- NativeLocaleStore para Services/Receivers Android sem Flutter ativo;
-- remoção de lógica nativa baseada em frases inglesas;
-- scan de XML Android e packages runtime por reachability;
-- ownership matrix para superfícies controladas pelo SO;
-- macOS MainMenu;
-- Windows installer PT-BR e limpeza de `com.example`;
-- Web `lang`/`dir` em runtime;
-- locale de voz/input independente;
-- bidi isolation;
-- evidência mínima reproduzível por PR.
-- `REMOTE_PRODUCT_COPY` para campanhas/suporte oficiais;
-- contrato locale-aware para catálogo remoto oficial de engines;
-- runtime assets JSON/YAML/Markdown/CSV no grafo de reachability;
-- notificações `background_downloader` fora do Android nativo;
-- `Text.rich`/`TextSpan`/`TextPainter`/CustomPainter como sinks de UI;
-- rich text reorder-safe por placeholders semânticos;
-- autônimos estáveis no seletor de idioma;
-- Gate L para copy remota/runtime;
-- Gate M para directionality e inline-text safety;
-- completeness report além de ARB/native resources.
-- Markdown/release notes oficiais com ownership explícito;
-- WebDAV Setup guide/link/QR com política de locale;
-- runtime visual assets com potencial texto;
-- separação entre CORE_UI_COMPLETENESS e PRODUCT_EXPERIENCE_COMPLETENESS;
-- `APP_SUPPLIED_SYSTEM_UI` para PiP/FilePicker e outras superfícies desenhadas pelo SO com copy fornecida pelo app;
-- `BUILD_GENERATED_PRODUCT_COPY` para workflow/scripts que geram metadata user-facing;
-- uma única fonte `.desktop` Linux e verificação nos AppImages x86_64/arm64;
-- `LocalizedCopyResolver` para services/background sem `BuildContext`;
-- delegates Material/Widgets/Cupertino explícitos;
-- `localizedTestApp`/test harness para evitar suite presa ao inglês;
-- resource placeholder/type parity no Android;
-- Gate N para provar localização dentro dos artifacts finais.
+- `docs/AUDITORIA_V8.md` — oitava auditoria
+- `docs/AUDITORIA_V7.md`
+- `docs/AUDITORIA_V6.md`
+- `docs/AUDITORIA_V5.md`
+- `docs/AUDITORIA_V4.md`
+- `docs/AUDITORIA_V3.md`
+- `docs/AUDITORIA_V2.md`
+- `docs/AUDITORIA_BASELINE.md`
+- `PLANO_MESTRE_V1.md` … `PLANO_MESTRE_V7.md` — versões superseded
+
+## O que o plano cobre
+
+A infraestrutura proposta separa App language de:
+
+- idioma de metadados;
+- áudio;
+- legendas;
+- região;
+- input/voz;
+- identidade/protocolo.
+
+E cobre, por reachability:
+
+- Flutter UI e múltiplos roots/bootstrap paths;
+- SettingsRows/Settings Search;
+- rich text/custom painting;
+- player Flutter;
+- Android TV native players;
+- Services/Receivers/notifications/PiP;
+- iOS/tvOS/Top Shelf/macOS;
+- Windows/Linux/Web/PWA;
+- runtime assets e remote product copy;
+- build-generated product copy;
+- official product content;
+- accessibility/RTL/pseudo locales;
+- Unicode/grapheme/list composition;
+- human numeric input;
+- cross-runtime/cross-device reason codes;
+- packaged artifact inspection;
+- real-device runtime smoke;
+- rollout/rollback;
+- baseline drift e audit freshness.
+
+## Registro canônico de gates
+
+    0
+    A B C D E F G H I J K L M N O P Q
+
+Nenhum documento normativo pode renumerar ou criar alias desses IDs.
 
 ## Regra central
 
-A linguagem da interface é independente de:
+Texto localizado nunca funciona como:
 
-- linguagem de metadados;
-- linguagem de áudio;
-- linguagem de legendas;
-- região.
+- ID;
+- valor persistido canônico;
+- condição de lógica;
+- protocolo;
+- cache key semântica.
 
-Texto localizado nunca pode funcionar como ID, valor persistido ou condição de lógica.
+A afirmação de completude vale somente para o SHA/tree auditado. Se o upstream muda, Gate Q precisa revalidar o delta antes que a cobertura seja considerada vigente.

@@ -1,4 +1,4 @@
-# Arquitetura i18n — V7
+# Arquitetura i18n — V8
 
 ## Stack
 
@@ -223,7 +223,7 @@ Locale corruption or localization failure must never block:
 Fallback is always deterministic, with English available.
 
 
-## Product-copy ownership V4
+## Product-copy ownership e copy remota oficial
 
 A origem física da string não decide se ela deve ser localizada. O owner decide.
 
@@ -288,6 +288,8 @@ Exemplos atuais:
 
 A arquitetura separa `CORE_UI_COMPLETENESS` de `PRODUCT_EXPERIENCE_COMPLETENESS`. Setup essencial deve ter locale policy; conteúdo editorial como release notes pode ter política separada, mas nunca ownership implícito.
 
+Quando o conteúdo abre em browser externo, App language e browser/system language são autoridades diferentes. O app passa `ProductLocaleId` explicitamente na URL quando o destino suporta; caso contrário, o destino precisa de landing/selector/fallback documentado. QR lido em outro dispositivo nunca é tratado como herdeiro do locale do app de origem.
+
 ## Runtime visual assets
 
 SVG com texto deve ser inspecionado estruturalmente. Raster/PDF runtime com potencial copy precisa de revisão visual e classificação `RUNTIME_VISUAL_ASSET`.
@@ -295,7 +297,7 @@ SVG com texto deve ser inspecionado estruturalmente. Raster/PDF runtime com pote
 
 ---
 
-# Hardening V6 — semantic locale boundaries
+# Fronteiras semânticas de locale
 
 ## Language display names
 
@@ -324,7 +326,7 @@ Gate O complementa source/artifact gates com smoke real de superfícies OS/hardw
 
 ---
 
-# Hardening V7 — composição textual e Unicode
+# Composição textual e Unicode
 
 ## Composition boundary
 
@@ -348,3 +350,66 @@ Copy localizada não sofre `toUpperCase/toLowerCase` por padrão. Casing é part
 ## Outbound text sinks
 
 Clipboard/share/export/report/plugin/system APIs que recebem human-readable app copy são presentation sinks mesmo quando nenhum widget renderiza a string diretamente.
+
+
+---
+
+# Contratos adicionados na V8
+
+## ProductLocaleId
+
+A identidade persistida do locale de UI é:
+
+    system | language[-Script][-REGION]
+
+Esse subconjunto corresponde ao que o `Locale` do Flutter representa sem perda para o produto. Variants, Unicode extensions e private-use não são silenciosamente descartados e regravados como outra preferência.
+
+Representações de plataforma são adapters, não identidades concorrentes:
+
+- product id: `pt-BR`;
+- ARB/Dart: `pt_BR`;
+- Android resource qualifier: `pt-rBR`;
+- Apple: `pt-BR`;
+- Linux locale suffix: `pt_BR`.
+
+## Android native locale store
+
+No baseline V8:
+
+- Dart `DevicePreferences` usa a API legada `SharedPreferences.getInstance()`;
+- `shared_preferences = 2.5.3`;
+- `shared_preferences_android = 2.4.10`;
+- arquivo físico Android: `FlutterSharedPreferences`;
+- logical key Dart: `ui_locale_v1`;
+- physical key Android: `flutter.ui_locale_v1`.
+
+`NativeLocaleStore` encapsula esse detalhe. Nenhum consumer nativo espalha file/key constants. Mudança de backend invalida o contract test e exige Gate 0/Q.
+
+## Presentation cache invariant
+
+Copy materializada não é estado canônico.
+
+- cachear dados semânticos por padrão;
+- cache inevitável de copy inclui `ProductLocaleId` efetivo na identidade e invalida na troca;
+- singleton/static localized string sem locale key é finding;
+- headless/background resolve o locale no momento de apresentar;
+- locale flip en → pt-BR → en sem restart faz parte da prova de runtime.
+
+## Baseline freshness
+
+A arquitetura é válida para o SHA/tree registrados em `AUDIT_BASELINE_MANIFEST.json`. Gate Q revalida qualquer nova base upstream e impede que allowlists/inventário de uma árvore antiga sejam tratados como prova da árvore nova.
+
+## Canonical gate registry
+
+Documentos normativos e automação usam somente:
+
+    0, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q
+
+Histórico de versões pertence aos arquivos `AUDITORIA_V*.md`; arquitetura, matriz e CI descrevem o contrato atual sem aliases históricos.
+
+
+## Accessibility language attribution
+
+App language e system language podem divergir. Além de localizar `semanticLabel`/contentDescription, o runtime precisa expor a língua correta para a subtree de copy app-owned.
+
+Na baseline Flutter 3.44.8, testar a Semantics tree. Se o root application-level não carregar o override como locale semântico suficiente, aplicar `Semantics(localeForSubtree: effectiveLocale)` no wrapper compartilhado dos roots. A pronúncia final permanece parcialmente dependente do SO/screen reader/vozes instaladas e por isso também exige Gate O.

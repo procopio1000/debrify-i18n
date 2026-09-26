@@ -1,4 +1,4 @@
-# Matriz de testes i18n — V7
+# Matriz de testes i18n — V8
 
 ## Locales
 
@@ -211,7 +211,7 @@ Before promoting pt-BR:
 - stale allowlist entry fails CI
 
 
-## V4 remote/runtime copy
+## Remote/runtime product copy
 
 - SupportRemoteConfig fixed Settings labels come from ARB;
 - fallback asset and cached config resolve correctly in en and pt-BR;
@@ -228,7 +228,7 @@ Before promoting pt-BR:
 - one stable QR can reach a locale-negotiating landing page or equivalent;
 - visual runtime assets with potential text are reviewed/classified.
 
-## V4 rich text/custom painting
+## Rich text/custom painting
 
 - Text.rich/RichText output is correct in en/pt-BR;
 - styled/clickable placeholders can move position according to locale grammar;
@@ -237,7 +237,7 @@ Before promoting pt-BR:
 - launch idents/custom painters are localized or explicitly BRAND_ART_DIRECTION;
 - no Canvas/TextPainter copy bypasses the inventory.
 
-## V4 directionality
+## Directionality
 
 - app-owned hardcoded TextDirection is zero or explicitly classified;
 - generic content text measurement uses ambient Directionality unless physically justified;
@@ -248,7 +248,7 @@ Before promoting pt-BR:
 
 ---
 
-# Matriz V6 — semantic/cross-device/runtime
+# Semantic/cross-device/runtime
 
 ## Language display names
 - eng/spa/por/pt-BR/por-br: identidade e display en/pt-BR;
@@ -286,7 +286,7 @@ Before promoting pt-BR:
 
 ---
 
-# Matriz V7 — composition/Unicode/outbound sinks
+# Composition/Unicode/outbound sinks
 
 ## List composition
 
@@ -316,3 +316,96 @@ Before promoting pt-BR:
 - qualquer copy humana copiada/compartilhada/exportada usa locale efetivo;
 - FilePicker/plugin/system title fornecido pelo app continua coberto como APP_SUPPLIED_SYSTEM_UI;
 - reports legíveis distinguem product copy de diagnostic/external detail.
+
+
+---
+
+# V8 — canonical locale, cache e baseline freshness
+
+## ProductLocaleId
+
+- `system` é sentinel separado de tags;
+- `pt-BR` round-trip lógico;
+- legado `pt_BR` -> `pt-BR`;
+- `zh-Hant-TW` e `sr-Latn-RS` preservam language/script/region em harness não-shipping;
+- `pt-PT` não cai silenciosamente em pt-BR;
+- `en-US-u-hc-h12` não é persistido após descartar extension;
+- `ca-ES-valencia` não é persistido após descartar variant;
+- private-use/malformed tag -> fallback seguro sem regravação truncada;
+- representation adapters produzem ARB/Android/Apple/Linux forms esperadas.
+
+## Android physical locale contract
+
+Baseline:
+
+    FlutterSharedPreferences
+    flutter.ui_locale_v1
+
+Testar:
+
+- Dart `DevicePreferences.setString('ui_locale_v1', 'pt-BR')` -> native cold-read pt-BR;
+- `system` -> contexto nativo resolve pela lista do SO;
+- ausência -> system/en seguro;
+- valor inválido/corrompido -> fallback seguro;
+- process kill antes de Service/Receiver;
+- upgrade de plugin/backend invalida contract fixture e bloqueia Gate 0/Q;
+- nenhum mirror `ui_locale_native_*`.
+
+## Presentation cache locale flip
+
+Sem restart:
+
+1. en;
+2. abrir Settings Search/overlay/dialog relevante;
+3. trocar para pt-BR;
+4. provar que copy long-lived não continua en;
+5. voltar para en;
+6. repetir com remote cached copy quando aplicável.
+
+Cobrir:
+
+- `LocalizedCopyResolver`;
+- Settings Search index;
+- remote product copy cache;
+- menus/overlays que mantêm estado;
+- native actions/channels quando plataforma permite atualização;
+- headless notification disparada após a troca.
+
+## Official external content
+
+- App language pt-BR + browser/system en: link oficial passa locale explícito quando contrato do destino suporta;
+- App language en + browser/system pt-BR: mesmo princípio;
+- URL sem locale explícito possui landing/selector/fallback documentado;
+- QR fixo aberto em outro dispositivo não é assertado como “seguindo o app de origem”;
+- WebDAV setup continua funcional independentemente da política de locale.
+
+## Gate Q / baseline drift
+
+- manifest SHA == upstream base -> fast path verde;
+- upstream base diferente -> diff obrigatório;
+- path Dart novo user-facing -> D–P reexecutados;
+- novo Android resource/Activity/Service -> H/N/O conforme reachability;
+- novo asset/config/workflow de packaging -> D/L/N;
+- mudança Flutter/`shared_preferences` -> Gate 0 + contratos dependentes;
+- tree recursive incompleta/truncated -> falha até estratégia completa;
+- allowlist de baseline antigo -> rejeitada;
+- documentos com gate alias/renumeração -> falha.
+
+## Gate registry consistency
+
+Assertar em CI/document lint:
+
+- plano contém exatamente IDs `0,A..Q`;
+- `CI_QUALITY_GATES.md` usa os mesmos IDs;
+- matriz referencia IDs canônicos;
+- nenhum documento normativo cria `Gate 1..14` ou `Gate 12 / Gate L`;
+- histórico de versão fica em `AUDITORIA_V*.md`, não como contrato paralelo.
+
+
+## Accessibility locale attribution
+
+- system en + App language pt-BR: subtree de copy própria expõe pt-BR no locale semântico esperado;
+- system pt-BR + App language en: subtree expõe en;
+- troca en → pt-BR sem restart atualiza também language attribution;
+- external/user data em outro idioma não é recategorizado cegamente;
+- screen reader real em ao menos um target confirma comportamento e registra limitações da voz/plataforma.

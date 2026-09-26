@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "planningVersion": "V8",
+  "auditedAt": "2026-09-25",
+  "upstream": {
+    "repository": "varunsalian/debrify",
+    "release": "v0.10.0-beta.1",
+    "auditedCommit": "9619c10b06ee919cacbe996b30be7739dc09c6d6",
+    "auditedTree": "cffb6c9d272c662eb0f5f93e6376cb4b239a57c3",
+    "recursiveTreeTruncated": false
+  },
+  "structuralCounts": {
+    "blobs": 3199,
+    "firstPartyProductRoots": 1736,
+    "firstPartyProductRootsPlusPackages": 2109,
+    "roots": {
+      "android": 530,
+      "assets": 53,
+      "ios": 49,
+      "lib": 972,
+      "linux": 12,
+      "macos": 32,
+      "packages": 373,
+      "tvos": 62,
+      "web": 7,
+      "windows": 19,
+      "docs": 45,
+      "dev": 361,
+      "test": 646,
+      "tool": 21
+    }
+  },
+  "toolchainBaseline": {
+    "flutter": "3.44.8",
+    "intlResolvedBeforeI18n": "0.19.0",
+    "sharedPreferences": "2.5.3",
+    "sharedPreferencesAndroid": "2.4.10"
+  },
+  "androidLegacySharedPreferencesContract": {
+    "file": "FlutterSharedPreferences",
+    "dartLogicalKey": "ui_locale_v1",
+    "androidPhysicalKey": "flutter.ui_locale_v1",
+    "note": "Valid only while DevicePreferences uses the legacy SharedPreferences API resolved by this baseline; Gate 0/Q must revalidate on dependency/backend changes."
+  },
+  "canonicalGateIds": [
+    "0",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q"
+  ]
+}
