@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "planningVersion": "V8",
+  "planningVersion": "V9",
   "auditedAt": "2026-09-25",
   "upstream": {
     "repository": "varunsalian/debrify",
@@ -61,5 +61,11 @@
     "O",
     "P",
     "Q"
-  ]
+  ],
+  "planningEvidence": {
+    "baselineRevalidatedAt": "2026-09-25",
+    "upstreamMainStatusAtAudit": "identical_to_auditedCommit",
+    "hotspotManifest": "docs/AUDIT_HOTSPOTS_V9.json",
+    "auditReport": "docs/AUDITORIA_V9.md"
+  }
 }
