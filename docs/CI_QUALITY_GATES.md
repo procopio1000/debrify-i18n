@@ -265,7 +265,8 @@ Antes da promoção:
 - Android TV hardware: native players, D-pad/focus, TV keyboard, notifications/channels, PiP;
 - tvOS hardware: focus/input/TopShelf;
 - native shell smoke nas demais plataformas publicadas;
-- screen reader em ao menos um cenário system locale != App language.
+- screen reader em ao menos um cenário system locale != App language;
+- Semantics tree do Flutter expõe o locale do App language onde a copy é app-owned.
 
 Registrar artifact SHA/build, device/OS, system locale, App language e evidência.
 
