@@ -326,7 +326,7 @@ PT-BR só entra em `ShippingLocales` quando **0 + A..Q** aplicáveis estiverem v
 
 Os IDs permanecem inalterados. Os requisitos abaixo são aditivos e fazem parte dos gates existentes.
 
-## Gate E — async presentation e continuidade
+### Reforço V9 — Gate E — async presentation e continuidade
 
 Falhar se:
 
@@ -334,7 +334,7 @@ Falhar se:
 - presentation cache materializado ignora `ProductLocaleId/localeEpoch`;
 - locale flip reseta navigation, playback, download, recording, pairing ou form/input state sem necessidade funcional documentada.
 
-## Gate F — calendar/time/collation
+### Reforço V9 — Gate F — calendar/time/collation
 
 Falhar ou exigir classificação quando houver:
 
@@ -346,29 +346,29 @@ Falhar ou exigir classificação quando houver:
 - first-day-of-week visual alterando `PROVIDER_CALENDAR_RULE`;
 - claim de collation locale-aware implementada só com `String.compareTo`, lowercase ou search-fold.
 
-## Gate H — Android authority
+### Reforço V9 — Gate H — Android authority
 
 - bloquear `android:localeConfig`, `LocaleManager`, `AppCompatDelegate.setApplicationLocales` ou equivalente se surgirem sem PR/contrato dedicado de migração de autoridade;
 - locale flip em Activity/player deve preservar sessão/posição/focus conforme aplicável.
 
-## Gate J — stateful locale flip e mixed-language a11y
+### Reforço V9 — Gate J — stateful locale flip e mixed-language a11y
 
 - Semantics locale attribution deve ser scoped por ownership;
 - external/user data em outro idioma não recebe App language cegamente;
 - locale flip com tela viva preserva navigation/focus/input state.
 
-## Gate O — runtime race/continuity
+### Reforço V9 — Gate O — runtime race/continuity
 
 - exercitar locale flip durante player/download/form state ativo;
 - forçar completion assíncrona antiga após troca e provar que não sobrescreve copy nova.
 
-## Gate P — Unicode search + epoch
+### Reforço V9 — Gate P — Unicode search + epoch
 
 - SettingsSearchNormalizer cobre NFC/NFD/combining marks no corpus PT-BR;
 - presentation completions fora de ordem respeitam `localeEpoch`;
 - mixed-script/mixed-language semantics são exercitadas quando aplicável.
 
-## Gate Q — packages e temporal drift
+### Reforço V9 — Gate Q — packages e temporal drift
 
 - novo/alterado runtime root sob `packages/**` exige classificação/scan;
 - mudança em calendar/formatter/platform-locale APIs exige reclassificação pela taxonomia V9;
