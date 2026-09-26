@@ -4,22 +4,26 @@ Projeto de planejamento e especificação para implementar internacionalização
 
 ## Estado atual
 
-**Plano canônico:** `PLANO_MESTRE_V8.md`
+**Plano canônico:** `PLANO_MESTRE_V9.md`
 
-A V8 foi re-auditada contra a árvore exata do upstream em 2026-09-25. Ela preserva todos os hardenings V1–V7 e fecha as últimas ambiguidades executáveis encontradas entre plano, CI e runtime nativo.
+A V9 foi re-auditada contra a mesma árvore exata do upstream em 2026-09-25; no momento da auditoria, o `main` upstream continuava idêntico ao commit auditado. Ela preserva V1–V8 e fecha ambiguidades restantes de calendário/tempo, concorrência assíncrona e autoridade de locale.
 
-Principais reforços V8:
+Principais reforços V9:
 
-- Gate P passa a existir também no plano canônico, não apenas nos documentos auxiliares;
-- um único registro de gates: `0, A..Q`;
-- Gate Q bloqueia drift não auditado do upstream;
-- `docs/AUDIT_BASELINE_MANIFEST.json` fixa baseline de forma machine-readable;
-- `ProductLocaleId = language[-Script][-REGION]` evita prometer round-trip de BCP-47 que o `Locale` do produto não preserva;
-- contrato Android baseline exato: `FlutterSharedPreferences / flutter.ui_locale_v1`;
-- presentation caches precisam ser locale-keyed/invalidation-safe;
-- links/QR oficiais distinguem App language de browser/system/outro dispositivo.
+- taxonomia temporal separa data/hora humana de timecode, protocolo, filename, diagnóstico e regras de calendário de provider;
+- hotspots reais de calendário/formatting ficam registrados em `docs/AUDIT_HOTSPOTS_V9.json`;
+- `localeEpoch` impede completion assíncrona do locale anterior de sobrescrever presentation state atual;
+- `LocaleFallbackPolicy` fica independente de `ShippingLocales`;
+- primeiro release pt-BR não cria segunda autoridade via Android per-app language;
+- search normalization ganha conformance NFC/NFD/combining marks;
+- collation real deixa de ser confundida com lowercase/search-fold;
+- Semantics language attribution passa a ser scoped por ownership;
+- locale flip vira contrato presentation-only;
+- runtime roots sob `packages/**` ganham regra operacional explícita de scan.
 
-V1–V7 permanecem como histórico/audit trail e não substituem a V8.
+O registro de gates continua estável em `0, A..Q`; a V9 fortalece gates existentes sem renumerá-los.
+
+V1–V8 permanecem como histórico/audit trail e não substituem a V9.
 
 ## Alvo verificado
 
@@ -41,15 +45,17 @@ Contagem estrutural não significa que todo arquivo contém UI; reachability e o
 
 ## Arquivos normativos
 
-- `PLANO_MESTRE_V8.md` — fonte canônica de implementação
-- `docs/ARQUITETURA.md` — arquitetura V8
-- `docs/CI_QUALITY_GATES.md` — gates V8 com IDs canônicos
-- `docs/MATRIZ_TESTES.md` — matriz V8
+- `PLANO_MESTRE_V9.md` — fonte canônica de implementação
+- `docs/ARQUITETURA.md` — arquitetura V9
+- `docs/CI_QUALITY_GATES.md` — gates V9 com IDs canônicos
+- `docs/MATRIZ_TESTES.md` — matriz V9
 - `docs/AUDIT_BASELINE_MANIFEST.json` — baseline machine-readable
+- `docs/AUDIT_HOTSPOTS_V9.json` — hotspots confirmados machine-readable
 - `docs/GLOSSARIO_PT_BR.md` — terminologia PT-BR
 
 ## Evidência/audit trail
 
+- `docs/AUDITORIA_V9.md` — nona auditoria
 - `docs/AUDITORIA_V8.md` — oitava auditoria
 - `docs/AUDITORIA_V7.md`
 - `docs/AUDITORIA_V6.md`
@@ -58,7 +64,7 @@ Contagem estrutural não significa que todo arquivo contém UI; reachability e o
 - `docs/AUDITORIA_V3.md`
 - `docs/AUDITORIA_V2.md`
 - `docs/AUDITORIA_BASELINE.md`
-- `PLANO_MESTRE_V1.md` … `PLANO_MESTRE_V7.md` — versões superseded
+- `PLANO_MESTRE_V1.md` … `PLANO_MESTRE_V8.md` — versões superseded
 
 ## O que o plano cobre
 

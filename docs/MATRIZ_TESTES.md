@@ -1,4 +1,4 @@
-# Matriz de testes i18n — V8
+# Matriz de testes i18n — V9
 
 ## Locales
 
@@ -35,6 +35,11 @@
 - BCP47 persisted pt-BR vs gen_l10n pt_BR
 - corrupt/unknown canonical native locale backing preference
 - App language vs OS-owned localization boundary
+- LocaleFallbackPolicy independent of ShippingLocales
+- future pt-PT addition does not silently mutate pt default
+- preferred [pt-PT, en-US] resolves deterministically
+- localeEpoch increments on effective locale change
+- stale async completion cannot publish old-locale copy
 
 ## Isolation invariants
 
@@ -320,7 +325,7 @@ Before promoting pt-BR:
 
 ---
 
-# V8 — canonical locale, cache e baseline freshness
+# Canonical locale, cache e baseline freshness
 
 ## ProductLocaleId
 
@@ -409,3 +414,80 @@ Assertar em CI/document lint:
 - troca en → pt-BR sem restart atualiza também language attribution;
 - external/user data em outro idioma não é recategorizado cegamente;
 - screen reader real em ao menos um target confirma comportamento e registra limitações da voz/plataforma.
+
+
+---
+
+# V9 — hardening temporal, concorrência e continuidade
+
+## Calendar/date presentation
+
+- Trakt calendar full date/month/headline/short weekday en/pt-BR;
+- IPTV EPG Today/Tomorrow/Yesterday en/pt-BR;
+- recordings human date en/pt-BR;
+- zero English manual month/weekday table em shipping presentation fora de allowlist;
+- first visual day-of-week pode seguir locale sem alterar provider fetch semantics.
+
+## Time taxonomy
+
+- CIVIL_TIME respeita preferência 12/24h salvo PRODUCT_FIXED_CLOCK justificado;
+- MEDIA_TIMECODE permanece mm:ss/h:mm:ss;
+- PROTOCOL_DATE_TIME/FILENAME_TIMESTAMP/DIAGNOSTIC_TIMESTAMP não mudam com App language;
+- PROVIDER_CALENDAR_RULE não muda com UI locale.
+
+## Model/presentation boundary
+
+- expiration/date/size saem de domain como dados tipados;
+- absence não usa English `N/A` como contrato de domínio;
+- presentation aplica locale somente a valores humanos;
+- IDs/PIN/porta/S01E02/timecode permanecem invariantes.
+
+## Async locale epoch
+
+- en A starts -> pt-BR -> B completes -> A completes late -> UI continua pt-BR;
+- repetir pt-BR -> en;
+- semantic payload neutro pode sobreviver; copy materializada não;
+- Settings Search, remote config e LocalizedCopyResolver usam o mesmo snapshot contract.
+
+## Search Unicode
+
+- composed/decomposed `Configuração`;
+- `áudio/audio`, `conexão/conexao`, `reprodução/reproducao`;
+- combining marks/emoji não quebram normalização;
+- normalização altera somente search key.
+
+## Collation
+
+- ordem de produto/provider permanece estável quando não há requisito alfabético;
+- search-fold não é usado como collator;
+- collator real, se introduzido, recebe testes en/pt-BR e cross-platform.
+
+## Android authority
+
+- pt-BR shipping funciona sem segunda autoridade Android per-app language;
+- source guard detecta adoção de localeConfig/LocaleManager/AppCompat sem migration contract;
+- cold-start/background continua lendo `ui_locale_v1`.
+
+## Mixed-language semantics
+
+- pt-BR app chrome + external title inglês;
+- en app chrome + filename/user data português;
+- app-owned semantics recebe App language;
+- idioma externo desconhecido não é inventado.
+
+## Locale-switch continuity
+
+- navigation stack preservado;
+- form/query não salvo preservado;
+- D-pad focus preservado/restaurado semanticamente;
+- playback source/position/session preservado;
+- download/recording preservado;
+- remote pairing/session preservado;
+- somente presentation/index caches são invalidados.
+
+## Runtime packages
+
+- scan recursivo de `packages/**` runtime roots;
+- classificação FIRST_PARTY_FORK/VENDORED_THIRD_PARTY/GENERATED;
+- app-owned patch copy em package vendorizado não é silenciosamente excluída;
+- artifact inspection confirma recursos localizados quando package muda.

@@ -1,6 +1,6 @@
-# Quality Gates i18n — V8
+# Quality Gates i18n — V9
 
-Este documento é normativo e usa exatamente os mesmos IDs de `PLANO_MESTRE_V8.md`.
+Este documento é normativo e usa exatamente os mesmos IDs de `PLANO_MESTRE_V9.md`.
 
 **Registro canônico:** `0, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q`.
 
@@ -318,3 +318,58 @@ Falhar se:
 ## Release promotion contract
 
 PT-BR só entra em `ShippingLocales` quando **0 + A..Q** aplicáveis estiverem verdes e a evidência mínima do plano estiver anexada. Não existe equivalência implícita entre IDs, e “não aplicável” precisa de justificativa versionada.
+
+
+---
+
+# Hardening normativo V9 por gate
+
+Os IDs permanecem inalterados. Os requisitos abaixo são aditivos e fazem parte dos gates existentes.
+
+### Reforço V9 — Gate E — async presentation e continuidade
+
+Falhar se:
+
+- completion assíncrona publica copy usando locale/epoch obsoleto;
+- presentation cache materializado ignora `ProductLocaleId/localeEpoch`;
+- locale flip reseta navigation, playback, download, recording, pairing ou form/input state sem necessidade funcional documentada.
+
+### Reforço V9 — Gate F — calendar/time/collation
+
+Falhar ou exigir classificação quando houver:
+
+- month/weekday/Today/Tomorrow/Yesterday manual em presentation;
+- `DateFormat`/`NumberFormat` user-facing sem locale efetivo;
+- data humana montada manualmente sem classificação;
+- civil clock forçado a 24h sem `PRODUCT_FIXED_CLOCK` explícito;
+- media timecode/protocol/filename/diagnostic timestamp sendo “localizado” por engano;
+- first-day-of-week visual alterando `PROVIDER_CALENDAR_RULE`;
+- claim de collation locale-aware implementada só com `String.compareTo`, lowercase ou search-fold.
+
+### Reforço V9 — Gate H — Android authority
+
+- bloquear `android:localeConfig`, `LocaleManager`, `AppCompatDelegate.setApplicationLocales` ou equivalente se surgirem sem PR/contrato dedicado de migração de autoridade;
+- locale flip em Activity/player deve preservar sessão/posição/focus conforme aplicável.
+
+### Reforço V9 — Gate J — stateful locale flip e mixed-language a11y
+
+- Semantics locale attribution deve ser scoped por ownership;
+- external/user data em outro idioma não recebe App language cegamente;
+- locale flip com tela viva preserva navigation/focus/input state.
+
+### Reforço V9 — Gate O — runtime race/continuity
+
+- exercitar locale flip durante player/download/form state ativo;
+- forçar completion assíncrona antiga após troca e provar que não sobrescreve copy nova.
+
+### Reforço V9 — Gate P — Unicode search + epoch
+
+- SettingsSearchNormalizer cobre NFC/NFD/combining marks no corpus PT-BR;
+- presentation completions fora de ordem respeitam `localeEpoch`;
+- mixed-script/mixed-language semantics são exercitadas quando aplicável.
+
+### Reforço V9 — Gate Q — packages e temporal drift
+
+- novo/alterado runtime root sob `packages/**` exige classificação/scan;
+- mudança em calendar/formatter/platform-locale APIs exige reclassificação pela taxonomia V9;
+- documentos normativos devem apontar `PLANO_MESTRE_V9.md` e manter o registro `0,A..Q`.

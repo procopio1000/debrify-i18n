@@ -1,4 +1,4 @@
-# Arquitetura i18n — V8
+# Arquitetura i18n — V9
 
 ## Stack
 
@@ -42,7 +42,7 @@ No authority implicitly writes another.
       pt-BR
       ...
 
-BCP 47 is the persisted representation.
+A identidade persistida de UI é `ProductLocaleId = language[-Script][-REGION]`, não BCP-47 irrestrito.
 
 V4 policy: App language is an installation/device setting.
 
@@ -354,7 +354,7 @@ Clipboard/share/export/report/plugin/system APIs que recebem human-readable app 
 
 ---
 
-# Contratos adicionados na V8
+# Contratos consolidados de baseline e locale
 
 ## ProductLocaleId
 
@@ -413,3 +413,40 @@ Histórico de versões pertence aos arquivos `AUDITORIA_V*.md`; arquitetura, mat
 App language e system language podem divergir. Além de localizar `semanticLabel`/contentDescription, o runtime precisa expor a língua correta para a subtree de copy app-owned.
 
 Na baseline Flutter 3.44.8, testar a Semantics tree. Se o root application-level não carregar o override como locale semântico suficiente, aplicar `Semantics(localeForSubtree: effectiveLocale)` no wrapper compartilhado dos roots. A pronúncia final permanece parcialmente dependente do SO/screen reader/vozes instaladas e por isso também exige Gate O.
+
+
+---
+
+# Contratos adicionados na V9
+
+## Temporal semantics
+
+Toda data/hora é classificada antes da migração: `HUMAN_DATE`, `CIVIL_TIME`, `PRODUCT_FIXED_CLOCK`, `MEDIA_TIMECODE`, `PROTOCOL_DATE_TIME`, `FILENAME_TIMESTAMP`, `DIAGNOSTIC_TIMESTAMP` ou `PROVIDER_CALENDAR_RULE`. UI humana segue locale/preferência; timecode, protocolo, filename, diagnóstico e regra funcional de provider permanecem invariantes quando essa é a semântica.
+
+## LocaleEpoch
+
+`AppLocaleController` mantém geração monotônica. Trabalho assíncrono locale-sensitive captura locale+epoch e só publica copy se o snapshot ainda for atual. Dados semânticos neutros podem sobreviver à troca.
+
+## LocaleFallbackPolicy
+
+`ShippingLocales` e fallback são contratos distintos. `pt -> pt-BR` é policy explícita/versionada; adicionar `pt-PT` não altera defaults automaticamente.
+
+## Android authority
+
+No primeiro release pt-BR, `ui_locale_v1/AppLocaleController` é a única autoridade do produto. Android per-app language do SO não é introduzido nesta fase; adoção futura exige migração dedicada.
+
+## Search Unicode e collation
+
+Search normalization é central e testada com NFC/NFD/combining marks. Search-fold nunca é collator. Ordenação locale-aware só é declarada quando houver solução real/testada.
+
+## Mixed-language Semantics
+
+Language attribution é scoped por ownership: copy app-owned recebe App language; external/user data não é rotulada cegamente.
+
+## Locale-switch continuity
+
+Locale flip é presentation-only. Navigation, playback/source/position, downloads, recordings, pairing, TV focus quando possível e input não salvo não são descartados.
+
+## Runtime packages
+
+Roots alcançáveis sob `packages/**/{lib,android,ios,tvos,macos,linux,windows,web}` entram nos scanners e recebem classificação `FIRST_PARTY_FORK`, `VENDORED_THIRD_PARTY` ou `GENERATED`.

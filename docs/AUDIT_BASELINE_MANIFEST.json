@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "planningVersion": "V8",
+  "planningVersion": "V9",
   "auditedAt": "2026-09-25",
   "upstream": {
     "repository": "varunsalian/debrify",
@@ -61,5 +61,51 @@
     "O",
     "P",
     "Q"
-  ]
+  ],
+  "planningEvidence": {
+    "baselineRevalidatedAt": "2026-09-25",
+    "upstreamMainStatusAtAudit": "identical_to_auditedCommit",
+    "hotspotManifest": "docs/AUDIT_HOTSPOTS_V9.json",
+    "auditReport": "docs/AUDITORIA_V9.md"
+  },
+  "flutterToolchainVerification": {
+    "ref": "3.44.8",
+    "files": {
+      "flutterLocalizationsPubspec": {
+        "path": "packages/flutter_localizations/pubspec.yaml",
+        "blobSha": "3852ca37454458b83c71cfd855a41dc9c70da544"
+      },
+      "localizationsUtils": {
+        "path": "packages/flutter_tools/lib/src/localizations/localizations_utils.dart",
+        "blobSha": "02818e65f3456b8393dff557f5ba73cc33c23bb2"
+      },
+      "materialLocalizations": {
+        "path": "packages/flutter_localizations/lib/src/material_localizations.dart",
+        "blobSha": "2017924da819cb530b91dcc891c3e3befb626fdc"
+      },
+      "genL10nTemplates": {
+        "path": "packages/flutter_tools/lib/src/localizations/gen_l10n_templates.dart",
+        "blobSha": "b31d652a98f186ac3f2f7d9019063be1b8dcba0b"
+      }
+    },
+    "verified": {
+      "intlPin": "0.20.2",
+      "generatedDelegates": [
+        "Material",
+        "Widgets",
+        "Cupertino"
+      ],
+      "l10nYamlOptions": [
+        "preferred-supported-locales",
+        "required-resource-attributes",
+        "nullable-getter",
+        "use-named-parameters",
+        "format",
+        "use-escaping"
+      ],
+      "materialDelegateLoadsIntlDateData": true,
+      "syntheticPackageTrue": "error_removed_feature",
+      "syntheticPackageFalse": "warning_no_effect_remove"
+    }
+  }
 }
