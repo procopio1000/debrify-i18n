@@ -19,7 +19,7 @@ Principais reforços V10:
 - `RuntimeSurfaceUniverse == ClassifiedReachable ∪ ExcludedWithEvidence` transforma “100%” em closure verificável da baseline;
 - nenhum Gate R é criado: D/E/F/P/Q são endurecidos mantendo `0, A..Q`.
 
-O registro de gates continua estável em `0, A..Q`; a V9 fortalece gates existentes sem renumerá-los.
+O registro de gates continua estável em `0, A..Q`; a V10 fortalece gates existentes sem renumerá-los.
 
 V1–V9 permanecem como histórico/audit trail e não substituem a V10.
 
