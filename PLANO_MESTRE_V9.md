@@ -9,7 +9,7 @@
 **Primeiro locale de release:** Português do Brasil (pt-BR)  
 **Template canônico:** inglês (en)  
 **Escopo:** Flutter + Android nativo/TV + Services/Receivers + iOS + tvOS + macOS + Windows + Linux + Web + packages runtime + acessibilidade + formatação + busca + CI + release  
-**Escopo estrutural revalidado na V8 pelo Git tree do commit-alvo:** 3.199 arquivos/blobs no repositório; 1.736 arquivos nos roots first-party de produto (`lib/`, `android/`, `assets/`, `ios/`, `linux/`, `macos/`, `tvos/`, `web/`, `windows/`); 2.109 quando `packages/` é incluído. Essas são contagens estruturais reproduzíveis, não uma alegação de que todo arquivo contém UI.
+**Escopo estrutural revalidado na V8 e novamente na V9 pelo Git tree do commit-alvo:** 3.199 arquivos/blobs no repositório; 1.736 arquivos nos roots first-party de produto (`lib/`, `android/`, `assets/`, `ios/`, `linux/`, `macos/`, `tvos/`, `web/`, `windows/`); 2.109 quando `packages/` é incluído. Essas são contagens estruturais reproduzíveis, não uma alegação de que todo arquivo contém UI.
 **Git tree auditada:** `cffb6c9d272c662eb0f5f93e6376cb4b239a57c3`
 
 ---
