@@ -325,7 +325,7 @@ Before promoting pt-BR:
 
 ---
 
-# V8 — canonical locale, cache e baseline freshness
+# Canonical locale, cache e baseline freshness
 
 ## ProductLocaleId
 
