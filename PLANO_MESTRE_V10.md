@@ -9,7 +9,7 @@
 **Primeiro locale de release:** Português do Brasil (pt-BR)  
 **Template canônico:** inglês (en)  
 **Escopo:** Flutter + Android nativo/TV + Services/Receivers + iOS + tvOS + macOS + Windows + Linux + Web + packages runtime + acessibilidade + formatação + busca + CI + release  
-**Escopo estrutural revalidado na V8 e novamente na V9 pelo Git tree do commit-alvo:** 3.199 arquivos/blobs no repositório; 1.736 arquivos nos roots first-party de produto (`lib/`, `android/`, `assets/`, `ios/`, `linux/`, `macos/`, `tvos/`, `web/`, `windows/`); 2.109 quando `packages/` é incluído. Essas são contagens estruturais reproduzíveis, não uma alegação de que todo arquivo contém UI.
+**Escopo estrutural revalidado na V8, V9 e novamente na V10 pelo Git tree do commit-alvo:** 3.199 arquivos/blobs no repositório; 1.736 arquivos nos roots first-party de produto (`lib/`, `android/`, `assets/`, `ios/`, `linux/`, `macos/`, `tvos/`, `web/`, `windows/`); 2.109 quando `packages/` é incluído. Essas são contagens estruturais reproduzíveis, não uma alegação de que todo arquivo contém UI.
 **Git tree auditada:** `cffb6c9d272c662eb0f5f93e6376cb4b239a57c3`
 
 ---
@@ -2578,7 +2578,7 @@ Entregas:
 - inventário de `APP_SUPPLIED_SYSTEM_UI` (PiP, FilePicker/dialogTitle, plugin/system surfaces);
 - inventário de `BUILD_GENERATED_PRODUCT_COPY`, inclusive `.github/workflows/build.yml` -> AppImage `.desktop`;
 - baseline dos test harnesses: MaterialApp/Directionality ad hoc e asserts textuais em inglês.
-- importar `docs/AUDIT_HOTSPOTS_V9.json` como seed verificável, sem tratá-lo como inventário completo;
+- importar `docs/AUDIT_HOTSPOTS_V10.json` como seed verificável (herdando V9), sem tratá-lo como inventário completo;
 - classificar runtime packages alcançáveis em FIRST_PARTY_FORK/VENDORED_THIRD_PARTY/GENERATED;
 - baseline de calendar/date tables, manual date assembly, fixed-hour-cycle e model-level presentation formatting.
 
@@ -2922,7 +2922,7 @@ Somente agora:
 
 ## 11.0 Registro canônico de gates
 
-Os IDs abaixo são API documental estável. `PLANO_MESTRE_V9.md`, `docs/CI_QUALITY_GATES.md`, matriz de testes, PR templates e scripts devem usar **os mesmos IDs**; aliases numéricos ou históricos são proibidos.
+Os IDs abaixo são API documental estável. `PLANO_MESTRE_V10.md`, `docs/CI_QUALITY_GATES.md`, matriz de testes, PR templates e scripts devem usar **os mesmos IDs**; aliases numéricos ou históricos são proibidos.
 
 | ID | Contrato |
 |---|---|
@@ -4209,7 +4209,7 @@ Ela é transformada em evidência mensurável por:
 
 Esse conjunto é o mecanismo que permite chegar a uma cobertura demonstrável e sustentável, inclusive depois que o Debrify continuar evoluindo.
 
-A V9 preserva e reforça a condição temporal introduzida na V8: cobertura só é atribuída ao SHA/tree registrado no manifest. Se a base upstream muda, a afirmação de completude expira até Gate Q revalidar o delta.
+A V10 preserva e reforça a condição temporal introduzida na V8/V9: cobertura só é atribuída ao SHA/tree registrado no manifest. Se a base upstream muda, a afirmação de completude expira até Gate Q revalidar o delta.
 
 ---
 
@@ -4253,4 +4253,4 @@ Cada PR deve anexar, conforme aplicável:
 - relatório Gate N/inspeção do artifact final quando o PR toca packaging/native resources;
 - prova de que build-generated copy não sobrescreveu a fonte localizada.
 
-A meta da V9 é transformar “100%” de uma promessa subjetiva em um conjunto auditável de provas reproduzíveis que cobre source code, plataformas nativas, assets de runtime, copy oficial remota, app-supplied system UI, build-generated product copy, testes e o conteúdo efetivamente presente nos artifacts publicados.
+A meta da V10 é transformar “100%” de uma promessa subjetiva em um conjunto auditável de provas reproduzíveis que cobre source code, plataformas nativas, assets de runtime, copy oficial remota, app-supplied system UI, build-generated product copy, testes e o conteúdo efetivamente presente nos artifacts publicados.
