@@ -1,4 +1,4 @@
-# Matriz de testes i18n — V9
+# Matriz de testes i18n — V10
 
 ## Locales
 
@@ -88,6 +88,8 @@
 | iOS/tvOS/macOS native copy | yes | | | manual | yes |
 | Web shell metadata | yes | | | | yes |
 | Windows/Linux runner copy | yes | | | | yes |
+| Declarative option registries | yes | yes | | yes | |
+| Compact social metrics | yes | yes | | | |
 
 ## Settings Search
 
@@ -491,3 +493,45 @@ Assertar em CI/document lint:
 - classificação FIRST_PARTY_FORK/VENDORED_THIRD_PARTY/GENERATED;
 - app-owned patch copy em package vendorizado não é silenciosamente excluída;
 - artifact inspection confirma recursos localizados quando package muda.
+
+
+---
+
+# V10 — indirect presentation, temporal e coverage closure
+
+## Declarative options/registries
+
+- `ContentDisplayMatchMode`: storageKey/behavior invariantes em en/pt-BR; label localizado;
+- `AndroidVideoRendererMode`: storageKey/videoOutput/hardwareDecoder invariantes; label/description localizados;
+- external players: executable/bundle/brand invariantes; System Default/Custom App/Custom Command/descriptions localizados;
+- `MetadataCategory` e `PlaylistViewMode`: identidade/behavior invariantes e display localizado;
+- Settings Search consome o mesmo mapper das telas;
+- locale flip atualiza labels sem regravar preferência;
+- launch-ident brand vs PRODUCT_COPY é classificado e testado.
+
+## Temporal presentation
+
+- `CalendarTimeFormat` não possui label app-owned fixo;
+- device mode respeita preferência do dispositivo;
+- explicit 12h/24h não concatena AM/PM manual;
+- `StremioTvNowPlaying` expõe estado/datas, não frase final;
+- tuner localiza Ended/Ends at usando o locale efetivo;
+- Debrify TV StatsTile formata `lastSearchedAt` como CIVIL_TIME;
+- TV time picker localiza título, instrução e ações mantendo AM/PM via MaterialLocalizations e D-pad intacto.
+
+## Compact metrics
+
+- YouTube views, Reddit score e Lemmy score mantêm números canônicos;
+- 999 / 1.000 / 1.250 / 999.999 / 1.000.000;
+- en / pt-BR;
+- palavra app-owned `views` não vive no service/model;
+- sort/filter/API não consome string compactada.
+
+## Coverage closure
+
+- todo path no `RuntimeSurfaceUniverse` aparece exatamente uma vez como reachable/classified ou excluded-with-evidence;
+- path novo quebra Gate Q;
+- blob alterado em source sensível exige re-scan;
+- generated registra source generator;
+- vendored patch com app-owned copy recebe ownership apropriado;
+- manifest stale falha CI.
