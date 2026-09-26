@@ -354,7 +354,7 @@ Clipboard/share/export/report/plugin/system APIs que recebem human-readable app 
 
 ---
 
-# Contratos adicionados na V8
+# Contratos consolidados de baseline e locale
 
 ## ProductLocaleId
 
