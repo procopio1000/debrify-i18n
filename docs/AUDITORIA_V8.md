@@ -62,6 +62,12 @@ A V7 tratava caches em pontos específicos, mas não havia invariant global cont
 
 **Correção V8:** cachear dados semânticos por padrão; presentation cache só com ProductLocaleId/invalidation; teste en → pt-BR → en sem restart.
 
+### 8. Locale da árvore de acessibilidade
+
+No Flutter 3.44.8, `Localizations` em nível de aplicação não atribui `localeForSubtree` no `Semantics` que cria; esse atributo é usado pelo caminho não-application-level. Portanto, texto traduzido não basta para provar a language attribution quando App language difere do system locale.
+
+**Correção V8:** inspeção da Semantics tree, wrapper `Semantics(localeForSubtree: effectiveLocale)` quando necessário e smoke real de screen reader com system/app locales diferentes.
+
 ## Ajustes documentais
 
 - V8 incorpora P e Q ao plano canônico.
