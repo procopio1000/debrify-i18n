@@ -164,6 +164,7 @@ A oitava auditoria revalidou a árvore Git inteira do baseline (3.199 blobs; res
 5. **O backing store Android podia ser mais preciso.** Na baseline, `DevicePreferences` usa o `SharedPreferences.getInstance()` legado; o código nativo já lê `FlutterSharedPreferences` com prefixo físico `flutter.`. Para este baseline, `ui_locale_v1` corresponde exatamente a `FlutterSharedPreferences / flutter.ui_locale_v1`. O adapter continua isolando esse detalhe para futura troca de backend.
 6. **Links oficiais externos e QR tinham uma promessa de locale ambígua.** Um browser externo pode negociar pela língua do browser/SO, não pelo override interno do Debrify; um QR aberto em outro dispositivo também não herda o App language. A V8 exige locale explícito na URL quando suportado, ou landing neutra com seletor/fallback documentado.
 7. **Caches de apresentação precisavam de uma regra geral.** Settings Search, remote copy e `LocalizedCopyResolver` já tinham cuidados locais, mas a política não proibia globalmente cachear texto já localizado sem locale/epoch na chave. A V8 torna isso invariant e adiciona testes de troca de idioma sem restart.
+8. **A língua da árvore de acessibilidade precisava de prova própria.** No Flutter 3.44.8, `Localizations` em nível de aplicação não atribui `localeForSubtree` ao `Semantics` gerado; esse atributo é aplicado no caminho não-application-level. Como App language pode divergir do system locale, a V8 exige inspeção da Semantics tree e, se necessário, um wrapper compartilhado com `Semantics(localeForSubtree: effectiveLocale)`, além de smoke real de screen reader.
 
 Evidências detalhadas ficam em `docs/AUDITORIA_V8.md`.
 
@@ -1628,7 +1629,7 @@ PT-BR deve testar:
 
 Para idiomas futuros, definir fallback de fonte antes de declará-los shipping.
 
-## 7.5 Semantics
+## 7.5 Semantics e language attribution
 
 Localizar:
 
@@ -1639,6 +1640,14 @@ Localizar:
 - status de progresso;
 - toggles;
 - image semantics quando realmente necessárias.
+
+Quando App language divergir do system locale, validar também a **língua atribuída à árvore Semantics**, não somente o texto:
+
+- no Flutter 3.44.8, a implementação de `Localizations` application-level não fornece `localeForSubtree` nesse wrapper;
+- criar teste com `SemanticsTester`/inspeção equivalente para verificar o locale efetivamente exposto ao subtree;
+- se o root não propagar o override de forma suficiente, o wrapper compartilhado dos roots deve aplicar `Semantics(localeForSubtree: effectiveLocale)` ao conteúdo apropriado;
+- não atribuir artificialmente o App language a trechos que são deliberadamente external/user data em outro idioma quando houver semântica mais adequada;
+- screen reader real continua no Gate O porque pronúncia/voz final também depende da plataforma e das vozes instaladas.
 
 ## 7.6 Teclado Debrify TV
 
@@ -2651,7 +2660,9 @@ Widget/golden/manual:
 - text scale;
 - TV focus;
 - narrow phone;
-- desktop.
+- desktop;
+- Semantics/contentDescription;
+- Semantics locale attribution quando App language != system locale.
 
 ## Gate K — No secrets/log regression
 
@@ -2724,7 +2735,8 @@ Registrar, com artifact SHA/build e evidência:
 - Android TV em hardware representativo: ambos players nativos, D-pad/focus, teclado próprio, notifications/channels e PiP quando suportado;
 - tvOS em Apple TV real/suportada: focus/input, Top Shelf e fronteira system/app language;
 - iOS/macOS/Windows/Linux: smoke das superfícies nativas publicadas quando aplicável;
-- screen reader/accessibility em pelo menos um cenário system language != App language.
+- screen reader/accessibility em pelo menos um cenário system language != App language;
+- inspeção prova que a subtree Flutter expõe o locale do App language onde a copy é app-owned.
 
 Aceite:
 
@@ -3403,6 +3415,7 @@ O trabalho está concluído somente quando TODOS os itens abaixo forem verdadeir
 - [ ] Web manifest/index sem placeholder Flutter.
 - [ ] Web documentElement lang/dir acompanha locale efetivo.
 - [ ] Semantics/contentDescription localizados.
+- [ ] Semantics locale attribution foi testada com App language != system locale; wrapper `localeForSubtree` aplicado se necessário no Flutter 3.44.8.
 - [ ] PT-BR font/glyph coverage validada.
 - [ ] Pseudo-LTR passa em superfícies críticas.
 - [ ] Pseudo-RTL não revela acoplamento físico evitável.
