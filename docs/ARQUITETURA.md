@@ -1,4 +1,4 @@
-# Arquitetura i18n — V4
+# Arquitetura i18n — V7
 
 ## Stack
 
@@ -320,3 +320,31 @@ TvTextField/TvKeyboard resolvem submit/action/semantics pelo locale efetivo, inc
 ## Runtime proof
 
 Gate O complementa source/artifact gates com smoke real de superfícies OS/hardware-dependent.
+
+
+---
+
+# Hardening V7 — composição textual e Unicode
+
+## Composition boundary
+
+Presentation não recebe apenas strings individuais. Listas/summaries também têm semântica de locale.
+
+Classificar composições como:
+
+- NATURAL_LANGUAGE_LIST -> formatter/mensagem locale-aware;
+- VISUAL_METADATA_LIST -> separator/design explícito + itens localizados/classificados;
+- MULTILINE_STRUCTURED_LIST -> estrutura invariant + chrome localizado;
+- TECHNICAL_LIST -> sem tradução automática.
+
+## Grapheme boundary
+
+Operações visuais de truncation/initials/delete/count usam grapheme clusters. Code-unit indexing/substrings só permanecem em protocolos/parsers binários/técnicos com justificativa.
+
+## Casing boundary
+
+Copy localizada não sofre `toUpperCase/toLowerCase` por padrão. Casing é parte da tradução ou de uma política semanticamente classificada.
+
+## Outbound text sinks
+
+Clipboard/share/export/report/plugin/system APIs que recebem human-readable app copy são presentation sinks mesmo quando nenhum widget renderiza a string diretamente.
