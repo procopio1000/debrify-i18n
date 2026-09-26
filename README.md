@@ -32,10 +32,10 @@ V1, V2, V3, V4 e V5 permanecem no repositório apenas como histórico/audit trai
 - docs/AUDITORIA_V3.md — histórico da terceira auditoria
 - docs/AUDITORIA_V2.md — histórico da segunda auditoria
 - docs/AUDITORIA_BASELINE.md — evidências da auditoria inicial
-- docs/ARQUITETURA.md — arquitetura V5
+- docs/ARQUITETURA.md — arquitetura V6
 - docs/GLOSSARIO_PT_BR.md — terminologia inicial
-- docs/MATRIZ_TESTES.md — matriz de testes V5
-- docs/CI_QUALITY_GATES.md — quality gates V5
+- docs/MATRIZ_TESTES.md — matriz de testes V6
+- docs/CI_QUALITY_GATES.md — quality gates V6
 
 ## O que a V6 consolida e acrescenta
 
