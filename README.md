@@ -4,11 +4,11 @@ Projeto de planejamento e especificação para implementar internacionalização
 
 ## Estado atual
 
-**Plano canônico:** PLANO_MESTRE_V5.md
+**Plano canônico:** PLANO_MESTRE_V6.md
 
-A V5 foi re-auditada contra a árvore exata do upstream, o workflow de release, o toolchain Flutter 3.44.8 e as fontes reais de copy em runtime/packaging em 2026-09-25. Ela preserva os hardenings da V4 e fecha build-generated copy, app-supplied system UI, PiP Android, delegates do framework, localization fora de BuildContext, test harness e verificação dentro dos artifacts.
+A V6 foi re-auditada contra a mesma baseline exata do upstream em 2026-09-25 e preserva todos os hardenings da V5. Ela fecha também display names de idiomas duplicados entre Dart/native, parsing de entrada humana locale-aware, copy do teclado próprio de TV, error contracts por reason code, protocolo Remote multi-device sem herdar a língua do emissor e smoke obrigatório em runtime real (Gate O).
 
-V1, V2, V3 e V4 permanecem no repositório apenas como histórico/audit trail.
+V1, V2, V3, V4 e V5 permanecem no repositório apenas como histórico/audit trail.
 
 ## Alvo verificado
 
@@ -20,24 +20,36 @@ V1, V2, V3 e V4 permanecem no repositório apenas como histórico/audit trail.
 
 ## Arquivos
 
-- PLANO_MESTRE_V5.md — plano canônico atual, toolchain/cross-runtime/packaging-verified-by-design e implementation-ready
+- PLANO_MESTRE_V6.md — plano canônico atual, toolchain/cross-runtime/cross-device/packaging/runtime-verified-by-design e implementation-ready
+- PLANO_MESTRE_V5.md — histórico/superseded pela V6
 - PLANO_MESTRE_V4.md — histórico/superseded pela V5
 - PLANO_MESTRE_V3.md — histórico/superseded pela V4
 - PLANO_MESTRE_V2.md — histórico/superseded pela V3
 - PLANO_MESTRE_V1.md — histórico/superseded
-- docs/AUDITORIA_V5.md — quinta auditoria, packaging/app-supplied system UI e evidências
+- docs/AUDITORIA_V6.md — sexta auditoria, semantic boundaries/cross-device/input/runtime smoke e evidências
+- docs/AUDITORIA_V5.md — histórico da quinta auditoria
 - docs/AUDITORIA_V4.md — histórico da quarta auditoria
 - docs/AUDITORIA_V3.md — histórico da terceira auditoria
 - docs/AUDITORIA_V2.md — histórico da segunda auditoria
 - docs/AUDITORIA_BASELINE.md — evidências da auditoria inicial
-- docs/ARQUITETURA.md — arquitetura V5
+- docs/ARQUITETURA.md — arquitetura V6
 - docs/GLOSSARIO_PT_BR.md — terminologia inicial
-- docs/MATRIZ_TESTES.md — matriz de testes V5
-- docs/CI_QUALITY_GATES.md — quality gates V5
+- docs/MATRIZ_TESTES.md — matriz de testes V6
+- docs/CI_QUALITY_GATES.md — quality gates V6
 
-## O que a V5 consolida e acrescenta
+## O que a V6 consolida e acrescenta
 
-Além da infraestrutura já consolidada na V3, a V4 mantém todos os contratos anteriores e acrescenta explicitamente:
+Além de todos os contratos V1–V5, a V6 acrescenta explicitamente:
+
+- nomes de idiomas como apresentação localizada, mantendo ISO/BCP-47 como identidade;
+- parsing locale-aware de entrada numérica humana sem alterar IP/URL/PIN/IDs/protocolos;
+- `keyboardSubmitLabel` e action/semantics do teclado Debrify TV como sinks explícitos;
+- reason/result codes estáveis em boundaries Dart/native/services;
+- Remote multi-device localizando no receptor, não no emissor;
+- Gate O de runtime real para PiP/notifications/FilePicker/Top Shelf/TV/accessibility;
+- detecção de ARB/allowlist órfãos/stale;
+
+A V6 também preserva integralmente o hardening acumulado anteriormente:
 
 - ShippingLocales separado dos locales gerados;
 - SettingsRows e Settings Search localizados por identidade estável;

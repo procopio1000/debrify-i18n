@@ -244,3 +244,41 @@ Before promoting pt-BR:
 - semantic left/right paddings/alignments migrate to start/end;
 - player timeline/media geometry intentionally physical remains stable;
 - package/vendored LTR behavior carries ownership evidence rather than silent exclusion.
+
+
+---
+
+# Matriz V6 — semantic/cross-device/runtime
+
+## Language display names
+- eng/spa/por/pt-BR/por-br: identidade e display en/pt-BR;
+- unknown code fallback técnico;
+- paridade Dart/Android;
+- external provider labels permanecem dados.
+
+## Localized numeric input
+- pt-BR: 8,5;
+- en: 8.5;
+- persistência canônica;
+- inválidos/ambíguos;
+- IP/URL/porta/PIN não localizados.
+
+## Error contract
+- reason code -> AppLocalizations;
+- PlatformException sem depender de message;
+- raw provider detail classificado/redacted.
+
+## Remote multi-device
+- sender en -> receiver pt-BR;
+- sender pt-BR -> receiver en;
+- success/failure/admin/retry/pairing;
+- backward compatibility com payload legado.
+
+## TV keyboard
+- default submit actions;
+- custom keyboardSubmitLabel;
+- Clear/paste/voice/backspace semantics;
+- OverlayEntry mantém locale.
+
+## Gate O
+- artifact/device/system locale/App language/evidência por cenário real.

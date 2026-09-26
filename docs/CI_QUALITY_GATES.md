@@ -214,3 +214,27 @@ Do not add PT-BR to ShippingLocales until:
 - runtime asset findings unclassified = 0;
 - hardcoded directionality findings unclassified = 0;
 - rich-text/custom-painter findings unclassified = 0.
+
+
+---
+
+# Adições V6
+
+## Extensões dos gates existentes
+
+**Gate B:** detectar keys ARB órfãs/não alcançadas e allowlist stale.  
+**Gate D:** incluir language display maps, TvTextField/TvKeyboard action labels e raw error/remote messages em sinks de UI.  
+**Gate E:** proibir display text/localized text como result identity em protocolo cross-device e branches por exception message.  
+**Gate F:** testar parsing de input humano pt-BR/en e separar tokens técnicos invariantes.
+
+## Gate O — Real-device runtime localization smoke
+
+Antes de promover pt-BR:
+
+- Android phone/tablet: system en ↔ app pt-BR e system pt-BR ↔ app en;
+- Android TV hardware: native players, D-pad/focus, keyboard, notifications/channels, PiP quando suportado;
+- tvOS hardware: focus/input/Top Shelf e boundary de system/app language;
+- native shell smoke nas demais plataformas publicadas;
+- accessibility/screen reader em ao menos um cenário system locale diferente do App language.
+
+Toda evidência registra artifact SHA/build, device/OS, system locale, App language e resultado.
