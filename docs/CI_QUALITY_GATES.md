@@ -1,4 +1,4 @@
-# Quality Gates i18n — V4
+# Quality Gates i18n — V7
 
 ## Gate 0 — dependency compatibility
 
@@ -238,3 +238,18 @@ Antes de promover pt-BR:
 - accessibility/screen reader em ao menos um cenário system locale diferente do App language.
 
 Toda evidência registra artifact SHA/build, device/OS, system locale, App language e resultado.
+
+
+---
+
+# Gate P — Unicode, composition e outbound text sinks
+
+Falhar ou exigir allowlist versionada quando um path user-facing possuir:
+
+- lista natural criada por `.join(', ')`/separador fixo sem formatter/ICU/classificação;
+- helper visual de truncate/capitalize/initials baseado em `String.length`, `substring`, `s[0]` ou code unit;
+- casing pós-localização não classificado;
+- Clipboard/share/export/report/plugin/system human-text sink sem ownership;
+- localized string persistida como resultado de composição quando dados semânticos poderiam ser persistidos.
+
+Exigir testes para 0/1/2/3+ listas e para combining mark, non-BMP, ZWJ emoji e regional flag nos helpers grapheme-sensitive.
