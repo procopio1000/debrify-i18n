@@ -39,7 +39,7 @@ Também foi reconfirmado no código:
 
 - Flutter 3.44.8 no workflow;
 - intl ^0.19.0;
-- shared_preferences ^2.2.2;
+- shared_preferences ^2.2.2 no pubspec, resolvendo `shared_preferences 2.5.3` e `shared_preferences_android 2.4.10` no lockfile;
 - ausência de flutter_localizations;
 - ausência de AppLocalizations;
 - ausência de supportedLocales;
@@ -578,7 +578,7 @@ Regras V3:
 - `required-resource-attributes`, `nullable-getter`, `format`, `use-escaping` e `use-named-parameters` existem no toolchain auditado;
 - CI deve tratar warning inesperado de `gen-l10n` como regressão;
 - cada ARB deve declarar `@@locale` coerente com o filename;
-- locale de arquivo gerado usa convenção do gen_l10n (`pt_BR`); persistência do produto continua BCP-47 (`pt-BR`).
+- locale de arquivo gerado usa convenção do gen_l10n (`pt_BR`); persistência do produto usa `ProductLocaleId` BCP-47-base (`pt-BR`).
 
 ## 3.4 Shipping locales separados dos generated locales
 
@@ -617,7 +617,7 @@ Responsabilidades:
 - obter `DevicePreferences.instance()`;
 - ler `ui_locale_v1` por `DevicePreferences`;
 - null/system = seguir sistema;
-- aceitar BCP 47;
+- aceitar somente `ProductLocaleId` canônico (`language[-Script][-REGION]`) para override manual;
 - normalizar aliases legados;
 - rejeitar locale não shipping;
 - persistir atomicamente via `DevicePreferences`;
@@ -688,7 +688,7 @@ Política V3 inicial:
 - `pt-PT` **não** faz language-only fallback para `pt-BR`;
 - `pt` sem região pode mapear para `pt-BR` somente por regra explícita de produto, documentada e testada; na V3 a regra recomendada é `pt -> pt-BR` enquanto houver um único locale português shipping;
 - valor legado `pt_BR` é normalizado para `pt-BR`;
-- tags BCP-47 são canonicalizadas antes do match;
+- `ProductLocaleId` e subtags-base vindos do SO são canonicalizados antes do match;
 - valor desconhecido não causa crash e volta a system/en;
 - o resolver customizado deve impedir que o fallback genérico do Flutter reintroduza `pt-PT -> pt-BR` acidentalmente.
 
@@ -833,7 +833,7 @@ Criar um adaptador pequeno, por exemplo `LocalizedCopyResolver`, com estas regra
 - pode expor um objeto estreito de mensagens para workers/plugins quando injetar `AppLocalizations` inteiro for excessivo;
 - não persiste locale e não observa plataforma por conta própria;
 - não usa `Intl.defaultLocale` como autoridade paralela;
-- cache, se existir, é keyed pela tag BCP-47 e invalidado/trocado quando o locale muda;
+- cache, se existir, é keyed pelo `ProductLocaleId` efetivo e invalidado/trocado quando o locale muda;
 - copy configurada em plugin/background é reconfigurada após mudança de App language quando a plataforma permite;
 - callbacks que executam em isolate/processo sem acesso à instância viva usam locale persistido canônico + contrato explícito da plataforma, nunca um mirror ad hoc.
 
@@ -2571,7 +2571,7 @@ Detectar não apenas Text, mas:
 - mapas/tabelas próprios que convertam language code diretamente para nome inglês user-facing;
 - raw exception/provider/remote `message` chegando a Text/SnackBar/Dialog sem classificação.
 
-## Gate E — Semantic coupling
+## Gate E — Semantic coupling e presentation-cache identity
 
 Falhar em novos casos de:
 
@@ -2581,7 +2581,9 @@ Falhar em novos casos de:
 - persistence de localized string;
 - lógica baseada em tradução;
 - protocolo cross-device que usa texto localizado como result/status identity;
-- UI que decide comportamento por `PlatformException.message`/`Exception.toString()`.
+- UI que decide comportamento por `PlatformException.message`/`Exception.toString()`;
+- singleton/static/cache que guarda copy localizada capaz de sobreviver à troca de idioma sem `ProductLocaleId`/invalidation;
+- resultado já localizado tratado como estado canônico em vez de semantic state + arguments.
 
 ## Gate F — Formatters
 
@@ -2664,7 +2666,10 @@ Falhar ou registrar blocker quando:
 - shipping locale cai para en em `REMOTE_PRODUCT_COPY`;
 - catálogo remoto oficial exibe descrição editorial sem locale/mapeamento aprovado;
 - cache de remote copy pode servir variante do locale anterior;
-- runtime asset user-facing escapa do inventário.
+- runtime asset user-facing escapa do inventário;
+- conteúdo oficial essencial acionado pelo app não declara a fronteira App language ↔ browser/system locale;
+- link oficial externo assume que `Accept-Language` do browser representa o override interno;
+- QR aberto em outro dispositivo é tratado como se herdasse o App language do dispositivo de origem.
 
 O relatório de completeness deve separar:
 
