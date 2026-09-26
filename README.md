@@ -4,11 +4,11 @@ Projeto de planejamento e especificação para implementar internacionalização
 
 ## Estado atual
 
-**Plano canônico:** PLANO_MESTRE_V6.md
+**Plano canônico:** PLANO_MESTRE_V7.md
 
-A V6 foi re-auditada contra a mesma baseline exata do upstream em 2026-09-25 e preserva todos os hardenings da V5. Ela fecha também display names de idiomas duplicados entre Dart/native, parsing de entrada humana locale-aware, copy do teclado próprio de TV, error contracts por reason code, protocolo Remote multi-device sem herdar a língua do emissor e smoke obrigatório em runtime real (Gate O).
+A V7 foi re-auditada contra a mesma baseline exata do upstream em 2026-09-25 e preserva todos os hardenings da V6. Ela fecha também composição de listas user-facing, truncamento/capitalização Unicode por grapheme cluster, casing pós-localização e sinks de texto humano fora da árvore de widgets (clipboard/share/export/report/plugin). O Gate P torna essas classes verificáveis em CI.
 
-V1, V2, V3, V4 e V5 permanecem no repositório apenas como histórico/audit trail.
+V1–V6 permanecem no repositório como histórico/audit trail.
 
 ## Alvo verificado
 
@@ -20,7 +20,8 @@ V1, V2, V3, V4 e V5 permanecem no repositório apenas como histórico/audit trai
 
 ## Arquivos
 
-- PLANO_MESTRE_V6.md — plano canônico atual, toolchain/cross-runtime/cross-device/packaging/runtime-verified-by-design e implementation-ready
+- PLANO_MESTRE_V7.md — plano canônico atual, toolchain/cross-runtime/cross-device/packaging/runtime-verified-by-design, unicode/composition-hardened e implementation-ready
+- PLANO_MESTRE_V6.md — histórico/superseded pela V7
 - PLANO_MESTRE_V5.md — histórico/superseded pela V6
 - PLANO_MESTRE_V4.md — histórico/superseded pela V5
 - PLANO_MESTRE_V3.md — histórico/superseded pela V4
