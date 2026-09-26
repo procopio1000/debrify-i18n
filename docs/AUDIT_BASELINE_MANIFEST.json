@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "planningVersion": "V9",
-  "auditedAt": "2026-09-25",
+  "planningVersion": "V10",
+  "auditedAt": "2026-09-26",
   "upstream": {
     "repository": "varunsalian/debrify",
     "release": "v0.10.0-beta.1",
@@ -63,10 +63,10 @@
     "Q"
   ],
   "planningEvidence": {
-    "baselineRevalidatedAt": "2026-09-25",
+    "baselineRevalidatedAt": "2026-09-26",
     "upstreamMainStatusAtAudit": "identical_to_auditedCommit",
-    "hotspotManifest": "docs/AUDIT_HOTSPOTS_V9.json",
-    "auditReport": "docs/AUDITORIA_V9.md"
+    "hotspotManifest": "docs/AUDIT_HOTSPOTS_V10.json",
+    "auditReport": "docs/AUDITORIA_V10.md"
   },
   "flutterToolchainVerification": {
     "ref": "3.44.8",
@@ -107,5 +107,35 @@
       "syntheticPackageTrue": "error_removed_feature",
       "syntheticPackageFalse": "warning_no_effect_remove"
     }
+  },
+  "coverageClosureContract": {
+    "universe": "RuntimeSurfaceUniverse",
+    "exactCover": [
+      "ClassifiedReachable",
+      "ExcludedWithEvidence"
+    ],
+    "requireDisjoint": true,
+    "requiredEvidenceFields": [
+      "path",
+      "blobSha",
+      "reachability",
+      "ownership",
+      "sourceKind",
+      "scanner",
+      "status"
+    ],
+    "enforcedBy": [
+      "D",
+      "Q"
+    ]
+  },
+  "v10Audit": {
+    "focus": [
+      "indirect_presentation_dataflow",
+      "temporal_presentation_boundary",
+      "compact_number_presentation",
+      "runtime_surface_coverage_closure"
+    ],
+    "inheritedHotspotManifest": "docs/AUDIT_HOTSPOTS_V9.json"
   }
 }

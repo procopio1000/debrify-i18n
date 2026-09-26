@@ -4,26 +4,24 @@ Projeto de planejamento e especificação para implementar internacionalização
 
 ## Estado atual
 
-**Plano canônico:** `PLANO_MESTRE_V9.md`
+**Plano canônico:** `PLANO_MESTRE_V10.md`
 
-A V9 foi re-auditada contra a mesma árvore exata do upstream em 2026-09-25; no momento da auditoria, o `main` upstream continuava idêntico ao commit auditado. Ela preserva V1–V8 e fecha ambiguidades restantes de calendário/tempo, concorrência assíncrona e autoridade de locale.
+A V10 foi re-auditada contra a mesma árvore exata do upstream em 2026-09-26; o `main` upstream continua idêntico ao commit auditado. Ela preserva V1–V9 e fecha blind spots de copy indireta em enums/models/registries, presentation formatting fora da borda visual e prova formal de cobertura contra a Git tree.
 
-Principais reforços V9:
+Principais reforços V10:
 
-- taxonomia temporal separa data/hora humana de timecode, protocolo, filename, diagnóstico e regras de calendário de provider;
-- hotspots reais de calendário/formatting ficam registrados em `docs/AUDIT_HOTSPOTS_V9.json`;
-- `localeEpoch` impede completion assíncrona do locale anterior de sobrescrever presentation state atual;
-- `LocaleFallbackPolicy` fica independente de `ShippingLocales`;
-- primeiro release pt-BR não cria segunda autoridade via Android per-app language;
-- search normalization ganha conformance NFC/NFD/combining marks;
-- collation real deixa de ser confundida com lowercase/search-fold;
-- Semantics language attribution passa a ser scoped por ownership;
-- locale flip vira contrato presentation-only;
-- runtime roots sob `packages/**` ganham regra operacional explícita de scan.
+- Gate D passa a rastrear copy app-owned em enums, extension getters, models/services, registries e option tables até o sink;
+- `CalendarTimeFormat` entra como hotspot explícito: labels deixam o enum e AM/PM manual deixa o formatter;
+- Stremio TV now-playing deixa de materializar `Ended / Ends at ...` dentro do model;
+- Debrify TV stats e o TV time picker entram no inventário temporal/UI;
+- métricas compactas de YouTube/Reddit/Lemmy passam a separar número canônico de presentation formatting;
+- Settings e Settings Search compartilham o mesmo localized mapper para options persistidas;
+- `RuntimeSurfaceUniverse == ClassifiedReachable ∪ ExcludedWithEvidence` transforma “100%” em closure verificável da baseline;
+- nenhum Gate R é criado: D/E/F/P/Q são endurecidos mantendo `0, A..Q`.
 
-O registro de gates continua estável em `0, A..Q`; a V9 fortalece gates existentes sem renumerá-los.
+O registro de gates continua estável em `0, A..Q`; a V10 fortalece gates existentes sem renumerá-los.
 
-V1–V8 permanecem como histórico/audit trail e não substituem a V9.
+V1–V9 permanecem como histórico/audit trail e não substituem a V10.
 
 ## Alvo verificado
 
@@ -35,7 +33,7 @@ V1–V8 permanecem como histórico/audit trail e não substituem a V9.
 - Primeiro locale completo: `pt-BR`
 - Template canônico: `en`
 
-Contagem estrutural reproduzida na V8:
+Contagem estrutural revalidada na V10 (mesma tree):
 
 - 3.199 blobs totais;
 - 1.736 arquivos nos roots first-party de produto;
@@ -45,16 +43,18 @@ Contagem estrutural não significa que todo arquivo contém UI; reachability e o
 
 ## Arquivos normativos
 
-- `PLANO_MESTRE_V9.md` — fonte canônica de implementação
-- `docs/ARQUITETURA.md` — arquitetura V9
-- `docs/CI_QUALITY_GATES.md` — gates V9 com IDs canônicos
-- `docs/MATRIZ_TESTES.md` — matriz V9
+- `PLANO_MESTRE_V10.md` — fonte canônica de implementação
+- `docs/ARQUITETURA.md` — arquitetura V10
+- `docs/CI_QUALITY_GATES.md` — gates V10 com IDs canônicos
+- `docs/MATRIZ_TESTES.md` — matriz V10
 - `docs/AUDIT_BASELINE_MANIFEST.json` — baseline machine-readable
-- `docs/AUDIT_HOTSPOTS_V9.json` — hotspots confirmados machine-readable
+- `docs/AUDIT_HOTSPOTS_V10.json` — hotspots V10 confirmados machine-readable
+- `docs/AUDIT_HOTSPOTS_V9.json` — hotspots V9 herdados
 - `docs/GLOSSARIO_PT_BR.md` — terminologia PT-BR
 
 ## Evidência/audit trail
 
+- `docs/AUDITORIA_V10.md` — décima auditoria
 - `docs/AUDITORIA_V9.md` — nona auditoria
 - `docs/AUDITORIA_V8.md` — oitava auditoria
 - `docs/AUDITORIA_V7.md`
@@ -64,7 +64,7 @@ Contagem estrutural não significa que todo arquivo contém UI; reachability e o
 - `docs/AUDITORIA_V3.md`
 - `docs/AUDITORIA_V2.md`
 - `docs/AUDITORIA_BASELINE.md`
-- `PLANO_MESTRE_V1.md` … `PLANO_MESTRE_V8.md` — versões superseded
+- `PLANO_MESTRE_V1.md` … `PLANO_MESTRE_V9.md` — versões superseded
 
 ## O que o plano cobre
 
@@ -97,7 +97,9 @@ E cobre, por reachability:
 - packaged artifact inspection;
 - real-device runtime smoke;
 - rollout/rollback;
-- baseline drift e audit freshness.
+- baseline drift e audit freshness;
+- declarative presentation dataflow;
+- coverage closure exata contra a Git tree.
 
 ## Registro canônico de gates
 

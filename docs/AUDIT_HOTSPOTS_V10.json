@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "planningVersion": "V10",
+  "upstreamCommit": "9619c10b06ee919cacbe996b30be7739dc09c6d6",
+  "upstreamTree": "cffb6c9d272c662eb0f5f93e6376cb4b239a57c3",
+  "note": "Confirmed V10 hotspots are audit seeds, not a replacement for the full RuntimeSurfaceUniverse coverage ledger.",
+  "confirmedHotspots": {
+    "declarativePresentationRegistries": [
+      "lib/models/content_display_match_mode.dart",
+      "lib/models/android_video_renderer_mode.dart",
+      "lib/models/external_player.dart",
+      "lib/models/windows_external_player.dart",
+      "lib/models/linux_external_player.dart",
+      "lib/models/ios_external_player.dart",
+      "lib/models/metadata_preferences.dart",
+      "lib/models/playlist_view_mode.dart",
+      "lib/widgets/launch/**"
+    ],
+    "optionConsumers": [
+      "lib/screens/settings/external_player_settings_page.dart",
+      "lib/screens/settings_screen.dart",
+      "lib/screens/settings/metadata_settings_page.dart"
+    ],
+    "temporalPresentation": [
+      "lib/widgets/calendar_display_preferences.dart",
+      "lib/models/stremio_tv/stremio_tv_now_playing.dart",
+      "lib/screens/stremio_tv/widgets/stremio_tv_tuner.dart",
+      "lib/screens/debrify_tv/widgets/stats_tile.dart",
+      "lib/widgets/tv_time_picker.dart"
+    ],
+    "compactMetricPresentation": [
+      "lib/services/youtube_service.dart",
+      "lib/widgets/youtube/youtube_video_card.dart",
+      "lib/services/reddit_service.dart",
+      "lib/widgets/reddit/reddit_video_card.dart",
+      "lib/services/lemmy_service.dart",
+      "lib/widgets/lemmy/lemmy_video_card.dart"
+    ],
+    "v9HotspotsInherited": "docs/AUDIT_HOTSPOTS_V9.json"
+  },
+  "coverageClosure": {
+    "universe": "RuntimeSurfaceUniverse",
+    "requiredPartition": [
+      "ClassifiedReachable",
+      "ExcludedWithEvidence"
+    ],
+    "requireDisjoint": true,
+    "requireExactCover": true,
+    "requiredFields": [
+      "path",
+      "blobSha",
+      "reachability",
+      "ownership",
+      "sourceKind",
+      "scanner",
+      "status"
+    ]
+  }
+}
