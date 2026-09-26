@@ -184,6 +184,8 @@ A nona auditoria revalidou a mesma baseline exata da V8 e confirmou que o `main`
 10. **App language é mutação de apresentação, não reset funcional.** Trocar en ↔ pt-BR não pode perder navigation stack, playback/source/position, D-pad focus sem necessidade, formulário não salvo, download/recording ou pairing remoto. Recriação nativa inevitável precisa restaurar esse estado.
 11. **Packages runtime vendorizados precisam de regra de scan operacional.** A árvore auditada possui `packages/` com Dart e código nativo Android/iOS/macOS/Linux/Windows. Gates D/H/N/Q passam a percorrer roots runtime de packages e exigem classificação `FIRST_PARTY_FORK`, `VENDORED_THIRD_PARTY` ou `GENERATED`.
 
+12. **Glossário canônico não pode carregar decisão editorial aberta.** A baseline do planejamento ainda dizia que “Player” poderia virar “Reprodutor”. A V9 fecha a copy PT-BR em **Reprodutor** e mantém `player` apenas como token técnico/código quando aplicável.
+
 Evidências detalhadas e hotspots confirmados ficam em `docs/AUDITORIA_V9.md` e `docs/AUDIT_HOTSPOTS_V9.json`.
 
 # 1. Objetivo e definição de sucesso
