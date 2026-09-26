@@ -91,7 +91,13 @@ Trocar idioma deve ser presentation-only.
 
 **Correção V9:** testes de navigation, focus, playback, downloads/recordings, pairing e form state.
 
-### 11. Packages runtime
+### 11. Editorial contract ainda tinha decisão aberta
+
+O glossário dizia que `Player` poderia virar “Reprodutor”, ao mesmo tempo em que o plano exigia consistência global.
+
+**Correção V9:** a copy PT-BR usa **Reprodutor**; `player` continua permitido como token técnico/código/protocolo. O glossário também passa a fixar termos temporais básicos usados pelos novos hotspots.
+
+### 12. Packages runtime
 
 A árvore inclui forks/packages com código Dart e nativo. “packages/” não pode ser uma fronteira implícita de exclusão.
 
