@@ -400,3 +400,12 @@ Assertar em CI/document lint:
 - matriz referencia IDs canônicos;
 - nenhum documento normativo cria `Gate 1..14` ou `Gate 12 / Gate L`;
 - histórico de versão fica em `AUDITORIA_V*.md`, não como contrato paralelo.
+
+
+## Accessibility locale attribution
+
+- system en + App language pt-BR: subtree de copy própria expõe pt-BR no locale semântico esperado;
+- system pt-BR + App language en: subtree expõe en;
+- troca en → pt-BR sem restart atualiza também language attribution;
+- external/user data em outro idioma não é recategorizado cegamente;
+- screen reader real em ao menos um target confirma comportamento e registra limitações da voz/plataforma.
