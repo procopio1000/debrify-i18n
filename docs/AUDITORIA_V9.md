@@ -11,6 +11,19 @@
 
 A comparação `9619c10... -> main` do upstream está **identical** no momento desta auditoria: 0 commits à frente, 0 atrás. A recursive tree auditada continua completa. A V9, portanto, não mascara drift: ela aprofunda a especificação sobre a mesma árvore V8.
 
+## Revalidação do toolchain Flutter 3.44.8
+
+A auditoria também foi confrontada com os arquivos da tag/ref exata `flutter/flutter@3.44.8`:
+
+- `flutter_localizations/pubspec.yaml` fixa `intl 0.20.2`;
+- `localizations_utils.dart` contém `preferred-supported-locales`, `required-resource-attributes`, `nullable-getter`, `use-named-parameters`, `format` e `use-escaping`;
+- o delegate Material chama `loadDateIntlDataIfNotLoaded()`;
+- o template gerado inclui delegates Material, Widgets e Cupertino;
+- `synthetic-package: true` falha porque a feature foi removida;
+- `synthetic-package: false` emite warning e deve ser removido.
+
+Os blob SHAs usados nessa prova estão registrados em `AUDIT_BASELINE_MANIFEST.json`.
+
 ## Achados novos
 
 ### 1. Calendar presentation hardcoded
