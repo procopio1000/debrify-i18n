@@ -9,7 +9,7 @@
 **Primeiro locale de release:** Português do Brasil (pt-BR)  
 **Template canônico:** inglês (en)  
 **Escopo:** Flutter + Android nativo/TV + Services/Receivers + iOS + tvOS + macOS + Windows + Linux + Web + packages runtime + acessibilidade + formatação + busca + CI + release  
-**Escopo estrutural verificado na V5 pelo Git tree do commit-alvo:** 3.199 arquivos/blobs no repositório; 1.736 arquivos nos roots first-party de produto (`lib/`, `android/`, `assets/`, `ios/`, `linux/`, `macos/`, `tvos/`, `web/`, `windows/`); 2.109 quando `packages/` é incluído. Essas são contagens estruturais reproduzíveis, não uma alegação de que todo arquivo contém UI.
+**Escopo estrutural revalidado na V6 pelo Git tree do commit-alvo:** 3.199 arquivos/blobs no repositório; 1.736 arquivos nos roots first-party de produto (`lib/`, `android/`, `assets/`, `ios/`, `linux/`, `macos/`, `tvos/`, `web/`, `windows/`); 2.109 quando `packages/` é incluído. Essas são contagens estruturais reproduzíveis, não uma alegação de que todo arquivo contém UI.
 **Git tree auditada:** `cffb6c9d272c662eb0f5f93e6376cb4b239a57c3`
 
 ---
@@ -3132,8 +3132,6 @@ O trabalho está concluído somente quando TODOS os itens abaixo forem verdadeir
 - [ ] README/documentação atualizados.
 - [ ] rollback path testado.
 
----
-
 - [ ] Language display names próprios usam code/semantic identity e resolver localizado; zero mapa inglês duplicado user-facing fora de allowlist.
 - [ ] Dart/Android native possuem paridade para nomes de idioma gerados pelo produto.
 - [ ] Entradas numéricas humanas são parseadas pelo locale efetivo e persistidas em forma canônica.
@@ -3145,6 +3143,8 @@ O trabalho está concluído somente quando TODOS os itens abaixo forem verdadeir
 - [ ] Gate O real-device runtime smoke passa com evidência por artifact/locale/device.
 - [ ] Accessibility smoke cobre pelo menos um cenário system language != App language.
 - [ ] ARB/allowlist stale-orphan gate está verde.
+
+---
 
 # 18. Checklist de auditoria para idiomas futuros
 
