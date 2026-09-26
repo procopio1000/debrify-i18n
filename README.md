@@ -27,6 +27,7 @@ V1–V6 permanecem no repositório como histórico/audit trail.
 - PLANO_MESTRE_V3.md — histórico/superseded pela V4
 - PLANO_MESTRE_V2.md — histórico/superseded pela V3
 - PLANO_MESTRE_V1.md — histórico/superseded
+- docs/AUDITORIA_V7.md — sétima auditoria, composition/Unicode/outbound text sinks e evidências
 - docs/AUDITORIA_V6.md — sexta auditoria, semantic boundaries/cross-device/input/runtime smoke e evidências
 - docs/AUDITORIA_V5.md — histórico da quinta auditoria
 - docs/AUDITORIA_V4.md — histórico da quarta auditoria
