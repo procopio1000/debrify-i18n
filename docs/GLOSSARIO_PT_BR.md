@@ -13,7 +13,7 @@
 | Search | Pesquisar | |
 | Sources | Fontes | contexto de reprodução |
 | Addons | Addons | manter termo técnico por enquanto |
-| Player | Player | pode virar “Reprodutor” se upstream preferir |
+| Player | Reprodutor | usar na copy PT-BR; `player` permanece token técnico/código quando aplicável |
 | Audio | Áudio | |
 | Subtitles | Legendas | |
 | Continue Watching | Continuar assistindo | |
@@ -41,6 +41,13 @@
 | Pair device | Parear dispositivo | |
 | Loading | Carregando | |
 | No results | Nenhum resultado | |
+| Today | Hoje | |
+| Tomorrow | Amanhã | |
+| Yesterday | Ontem | |
+| Expires | Expira em | usar com data/valor, não concatenar formato manual |
+| Expired | Expirado | |
+| Last updated | Última atualização | |
+| Time format | Formato de hora | |
 | Play | Reproduzir | |
 | Pause | Pausar | |
 | Next | Próximo | |
