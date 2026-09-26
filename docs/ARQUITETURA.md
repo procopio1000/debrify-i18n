@@ -406,3 +406,10 @@ Documentos normativos e automação usam somente:
     0, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q
 
 Histórico de versões pertence aos arquivos `AUDITORIA_V*.md`; arquitetura, matriz e CI descrevem o contrato atual sem aliases históricos.
+
+
+## Accessibility language attribution
+
+App language e system language podem divergir. Além de localizar `semanticLabel`/contentDescription, o runtime precisa expor a língua correta para a subtree de copy app-owned.
+
+Na baseline Flutter 3.44.8, testar a Semantics tree. Se o root application-level não carregar o override como locale semântico suficiente, aplicar `Semantics(localeForSubtree: effectiveLocale)` no wrapper compartilhado dos roots. A pronúncia final permanece parcialmente dependente do SO/screen reader/vozes instaladas e por isso também exige Gate O.
