@@ -291,3 +291,32 @@ A arquitetura separa `CORE_UI_COMPLETENESS` de `PRODUCT_EXPERIENCE_COMPLETENESS`
 ## Runtime visual assets
 
 SVG com texto deve ser inspecionado estruturalmente. Raster/PDF runtime com potencial copy precisa de revisão visual e classificação `RUNTIME_VISUAL_ASSET`.
+
+
+---
+
+# Hardening V6 — semantic locale boundaries
+
+## Language display names
+
+Códigos ISO 639/BCP-47 são identidade; nomes apresentados são copy. Flutter e Android nativo devem compartilhar a mesma semântica de code -> key, com resolução localizada no runtime que renderiza.
+
+## Localized human input
+
+Output locale-aware não basta. Inputs numéricos humanos são parseados pelo locale efetivo e imediatamente convertidos para valor tipado canônico. IP, URL, porta, PIN, ID, hash e formatos de protocolo permanecem invariantes.
+
+## Error/result boundaries
+
+Dart/native/services e Remote usam reason/result codes estáveis + argumentos. Exception strings são diagnóstico/external data, nunca identidade de UX.
+
+## Remote multi-device
+
+App language é device-local. Nenhum peer envia copy localizada como resultado canônico para outro dispositivo; o receptor localiza o result code.
+
+## TV keyboard
+
+TvTextField/TvKeyboard resolvem submit/action/semantics pelo locale efetivo, inclusive quando renderizados em OverlayEntry.
+
+## Runtime proof
+
+Gate O complementa source/artifact gates com smoke real de superfícies OS/hardware-dependent.
