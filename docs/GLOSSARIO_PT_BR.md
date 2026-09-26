@@ -55,3 +55,10 @@
 | Fast forward 10 seconds | Avançar 10 segundos | |
 | Audio Tracks | Faixas de áudio | |
 | Subtitle Tracks | Faixas de legenda | |
+| Device default | Padrão do dispositivo | para preferência de formato de hora; não confundir com System default global |
+| 12-hour | 12 horas | opção de formato de hora |
+| 24-hour | 24 horas | opção de formato de hora |
+| Ends at | Termina às | usar placeholder de hora localizado |
+| Ended | Encerrado | contexto de programação/slot já encerrado |
+| Custom App | Aplicativo personalizado | nome genérico; brands não traduzir |
+| Custom Command | Comando personalizado | nome genérico; comando técnico permanece invariável |
